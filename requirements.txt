@@ -1,0 +1,9 @@
+certifi==2019.9.11
+chardet==3.0.4
+idna==2.8
+numpy==1.17.2
+pyzmq==18.1.0
+requests==2.22.0
+six==1.12.0
+urllib3==1.25.6
+vk-api==11.5.0
