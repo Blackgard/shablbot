@@ -1,4 +1,4 @@
-# <img alt="bot-icon" src="https://image.flaticon.com/icons/svg/1786/1786548.svg" width="40px"></img>&nbsp;vk-bot-python (beta name Empty)
+# <img alt="bot-icon" src="https://image.flaticon.com/icons/svg/1786/1786548.svg" width="40px"></img>&nbsp;ShablBot
 ![Build](https://img.shields.io/azure-devops/build/sasna142/vk-bot-python/1)
 <br>
 
