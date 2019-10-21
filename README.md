@@ -6,7 +6,9 @@
 Бот для социальной сети Вконтакте, работающий через VkBotLongPull (Через сообщество вконтакте).
 
 # Установка
-`git clone https://github.com/Blackgard/vk-bot-python.git`
+```
+  git clone https://github.com/Blackgard/vk-bot-python.git
+```
 
 # Настройка бота 
 Все для регулировки бота находится в файле **settings.py**.
@@ -18,3 +20,10 @@
   4. *admin_id* - Id человека, от лица которого будет происходить администирование бота.
   
 Остальные параметры для начального запуска бота менять не нужно.
+
+# Запуск бота
+
+```
+  windows : python setup.py
+  linux   : python3 setup.py
+```
