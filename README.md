@@ -24,6 +24,6 @@
 # Запуск бота
 
 ```
-  windows : python setup.py
-  linux   : python3 setup.py
+  windows : python run_bot.py
+  linux   : python3 run_bot.py
 ```
