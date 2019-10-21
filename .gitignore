@@ -4,4 +4,5 @@
 env/
 __pycache__
 components/__pycache__
-    
+MANIFEST.in
+README.rst    
