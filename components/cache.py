@@ -1,53 +1,46 @@
-from collections import Counter
 import datetime as dt
-from settings import CONST
-from components.public_functions import setTime
+from collections import Counter
 
+from settings import SETTINGS
 class CACHE:
-    time_work_group = {} 
+    """
+    Класс реализующий функционал кэширования данных необходимых для работы бота
+    """
+    settings_chat  = {} 
     counter_word    = {}
-    included        = {}
 
-def set_time_work_delta(group_id, type_time = None, t_from = None, t_to = None):
-    if not t_from and not t_to and not type_time:
-        try:
-            for _group_id, time_work in CONST.time_work_group.items():
-                if _group_id == group_id:
-                    type_time = time_work["type"]
-                    break
-            
-            if type_time == None or type_time == CONST.def_time_work:
-                return {
-                    "type" : CONST.def_time_work
-                }
+from components.chat_settings import get_settings_chat
 
-            t_from  = setTime(CONST.time_work_group[group_id]["from"])
-            t_to    = setTime(CONST.time_work_group[group_id]["to"])
-        except EnvironmentError as err:
-            print(err)
-
-        return  {
-            "type"  : type_time,
-            "from"  : t_from,
-            "to"    : t_to,
-        }
-
-
-def save_group_to_cache(group_id):
+def save_chat_to_cache(chat_id, settings = None):
     """
-    Функция задает начальные правила для работы бота с новой группой.
+    Функция задает начальные правила для работы бота с новой группой
+
+    Параметры
     ---
-    Настройка правил производится с помощью дописания в данный блок новых модификаций.
-
-    :param (int) group_id - уникальный идентификатор группы, для которой задаются правила (peer_id в vkApi).
+    ```
+    int  : chat_id  - уникальный идентификатор группы, для которой задаются правила
+    dict : settings - настройки бота полученные из get_settings_chat (Не обязательный параметр) 
+    ```
     """
-    find_group = CACHE.included.get(group_id)
 
-    if find_group is None:
-        CACHE.included[group_id]        = True
-        CACHE.counter_word[group_id]    = Counter()
-        CACHE.time_work_group[group_id] = set_time_work_delta(group_id)
-        print(f"Была сохранена группа #{group_id}")
+    find_chat = CACHE.settings_chat.get(chat_id)
+    try:
+        if find_chat is None:
+            if settings:
+                CACHE.settings_chat[chat_id] = settings
+            else:    
+                CACHE.settings_chat[chat_id] = get_settings_chat(chat_id) 
+            CACHE.counter_word[chat_id]    = Counter()
 
-def add_single_value(group_id, type_answer):
-    CACHE.counter_word[group_id] += Counter([type_answer])
+            if SETTINGS.debug:
+                print(f"Была сохранена группа #{chat_id}")
+    except:
+        return False
+    return True
+
+def add_single_value_counter_chat(chat_id, type_word):
+    try:
+        CACHE.counter_word[chat_id] += Counter([type_word])
+        return True
+    except:
+        return False
