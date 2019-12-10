@@ -4,7 +4,7 @@
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
-class CONST:
+class SETTINGS:
     """
     Класс хрянящий все неизменяющиеся переменные.
     """
@@ -130,7 +130,7 @@ class CONST:
     #   t_from    - время работы бота с какого-то конкретного часа
     #   t_to      - время работы бота по какой-то конкретный час
     # Чтобы понять как задаются данные параметры, необходимо заглянуть в файл components.chat_settings.
-    time_work_group = {            
+    settings_chat = {            
         123456789 : {
             "time_type" : type_time_work[0],
             "included"  : True
@@ -235,9 +235,9 @@ class CONST:
     # При внесении новых слов и ответов на них необходимо так же в данном 
     # списке предоставить зависимости
     templ_and_respons = {
-        CONST.def_templ[0]                              : CONST.answers['по умолчанию'],
-        CONST.all_templ["приветствие"]['здравствуй']    : CONST.answers["приветствие"]['здравствуй'],
-        CONST.all_templ["приветствие"]['здравствуй']    : CONST.answers["приветствие"]['здравствуй'],
-        CONST.all_templ["прощание"]["пока"]             : CONST.answers['прощание']["пока"],
-        CONST.all_templ["прощание"]["до свидания"]      : CONST.answers['прощание']["до свидания"]
+        def_templ[0]                              : answers['по умолчанию'],
+        all_templ["приветствие"]['здравствуй']    : answers["приветствие"]['здравствуй'],
+        all_templ["приветствие"]['здравствуй']    : answers["приветствие"]['здравствуй'],
+        all_templ["прощание"]["пока"]             : answers['прощание']["пока"],
+        all_templ["прощание"]["до свидания"]      : answers['прощание']["до свидания"]
     }

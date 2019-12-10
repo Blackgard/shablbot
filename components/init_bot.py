@@ -10,6 +10,7 @@ def check_module(module_path):
     return module_spec
 
 def import_module_from_spec(module_spec):
+
     module = module_from_spec(module_spec)
     module_spec.loader.exec_module(module)
 
@@ -24,8 +25,6 @@ def load_cache():
     from components.chat_settings import get_settings_chat
     from components.cache import save_chat_to_cache
 
-    err = []
-
     for chat_id, _settings in SETTINGS.settings_chat.items():
         settings_chat = get_settings_chat(
             chat_id, 
@@ -37,10 +36,6 @@ def load_cache():
 
         save_chat_to_cache(chat_id, settings_chat)
 
-    if err == []:
-        return None
-    return err 
-
 def load_modules():
     """
     Функция загрузки активированных в settings.py модулей бота.
@@ -49,23 +44,23 @@ def load_modules():
 
     load_name = 'modules'
     for module_name in SETTINGS.active_modules:
-        err = []
 
         module_spec = check_module(f'{load_name}.{module_name}')
         init_module = import_module_from_spec(module_spec)
 
-        if not init_module:
-            err.append(f"Модуль {module} не был подключен.")
-        else:
-            MODULES.active_modules[module_name] = {
-                "full_name" : module_spec.name,
-                "settings"  : init_module.settings,
-                "path"      : module_spec.loader.path
-            }
+        assert init_module, f"""
+        Модуль {module_name} не был подключен.
+        Инфо:
+            name - {module_spec.name}
+            path - {module_spec.loader.path}
+        """
+
+        MODULES.active_modules[module_name] = {
+            "full_name" : module_spec.name,
+            "settings"  : init_module.settings,
+            "path"      : module_spec.loader.path
+        }
             
-    if err == []:
-        return None
-    return err 
 
 def init_components():
     """
@@ -80,21 +75,6 @@ def init_components():
     тогда все компоненты были загруженны успешно, если False - не успешно.\n
     `(list) error_init` - Параметр содержащий в себе ошибки, вызванные в процессе 
     инициализации компонентов.
-    ```
-    Примеры:
-    ==> True, None  
-    ==> False, [    
-        Проблемы с cache    - None,
-        Проблемы с модулями - [ Модуль games.flip_and_roll не был подключен. ]
-    ]
-    ```
     """
-
-    err_load_cache    = load_cache()
-    err_load_modules  = load_modules()
-
-    if err_load_cache is None and err_load_modules is None:
-        return True, None
-    else:
-        err = f"Проблемы с cache - {err_load_cache}\nПроблемы с модулями - {err_load_modules}"
-        return False, err
+    load_cache()
+    load_modules()
