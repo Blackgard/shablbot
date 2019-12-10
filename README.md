@@ -1,5 +1,5 @@
 # <img alt="bot-icon" src="https://image.flaticon.com/icons/svg/1786/1786548.svg" width="40px"></img>&nbsp;ShablBot
-![Build](https://img.shields.io/azure-devops/build/sasna142/shablbot/2)
+![Build](https://img.shields.io/azure-devops/build/sasna142/026fd26f-bb59-48fd-bb91-6d9ebe113f87/2)
 ![License](https://img.shields.io/github/license/blackgard/shablbot)
 <br>
 
