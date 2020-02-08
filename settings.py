@@ -4,10 +4,14 @@
 from dotenv import load_dotenv
 import os
 
+<<<<<<< HEAD
 BASE_DIR = os.path.dirname(__file__)
 load_dotenv(dotenv_path=os.path.join(BASE_DIR, ".env"))
 print(os.getenv("TOKEN"))
 
+=======
+@dataclass(frozen=True)
+>>>>>>> ae9d79a4447c54c2f59943635f156b43d9b80e37
 class SETTINGS:
     """
     Класс хрянящий все неизменяющиеся переменные.

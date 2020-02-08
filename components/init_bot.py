@@ -13,6 +13,7 @@ def check_module(module_path):
         return None, err
 
 def import_module_from_spec(module_spec):
+
     module = module_from_spec(module_spec)
 
     if module: 
@@ -57,9 +58,6 @@ def load_modules():
                 module_name : modul_err.args[0]
             })
             
-    if err == []:
-        return None
-    return err 
 
 def init_components():
     """
@@ -74,6 +72,7 @@ def init_components():
     тогда все компоненты были загруженны успешно, если False - не успешно.\n
     `(list) error_init` - Параметр содержащий в себе ошибки, вызванные в процессе 
     инициализации компонентов.
+<<<<<<< HEAD
     ```
     Примеры:
     ==> True, None  
@@ -95,3 +94,8 @@ def init_components():
         import json
         err = "\nПроблемы с модулями:\n" + json.dumps(err_load_modules, indent=4, sort_keys=True)
         return False, err
+=======
+    """
+    load_cache()
+    load_modules()
+>>>>>>> ae9d79a4447c54c2f59943635f156b43d9b80e37
