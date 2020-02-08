@@ -6,20 +6,16 @@ from settings import SETTINGS
 from importlib.util import find_spec, module_from_spec
 
 def check_module(module_path):
-    try:
-        module_spec = find_spec(module_path)
-        return module_spec, None
-    except ModuleNotFoundError as err:   
-        return None, err
+    module_spec = find_spec(module_path)
+    return module_spec
 
 def import_module_from_spec(module_spec):
-
-    module = module_from_spec(module_spec)
-
-    if module: 
+    try:
+        module = module_from_spec(module_spec)
         module_spec.loader.exec_module(module)
-        return module
-    return None
+        return module, None
+    except Exception as err:
+        return None, err
 
 def load_cache():
     """
@@ -40,23 +36,27 @@ def load_modules():
     """
     from modules.modules import MODULES
 
-    folder_name = 'modulesp'
+    folder_name = 'modules'
     err = []
     
     for module_name in SETTINGS.active_modules:
-        module_spec, modul_err = check_module(f'{folder_name}.{module_name}')
+        module_spec = check_module(f'{folder_name}.{module_name}')
+        init_module, import_err = import_module_from_spec(module_spec)
         
-        if module_spec is not None:       
-            init_module = import_module_from_spec(module_spec)
+        if init_module is not None:
             MODULES.active_modules[module_name] = {
                 "full_name" : module_spec.name,
                 "settings"  : init_module.settings,
                 "path"      : module_spec.loader.path
             }
-        else: 
+        else:            
             err.append({
-                module_name : modul_err.args[0]
+                module_name : str(import_err)           
             })
+    
+    if err is None:
+        return err
+    return None
             
 
 def init_components():
@@ -72,7 +72,6 @@ def init_components():
     тогда все компоненты были загруженны успешно, если False - не успешно.\n
     `(list) error_init` - Параметр содержащий в себе ошибки, вызванные в процессе 
     инициализации компонентов.
-<<<<<<< HEAD
     ```
     Примеры:
     ==> True, None  
@@ -86,7 +85,7 @@ def init_components():
     """
      
     load_cache()
-    err_load_modules  = load_modules()
+    err_load_modules = load_modules()
 
     if err_load_modules is None:
         return True, None
@@ -94,8 +93,3 @@ def init_components():
         import json
         err = "\nПроблемы с модулями:\n" + json.dumps(err_load_modules, indent=4, sort_keys=True)
         return False, err
-=======
-    """
-    load_cache()
-    load_modules()
->>>>>>> ae9d79a4447c54c2f59943635f156b43d9b80e37
