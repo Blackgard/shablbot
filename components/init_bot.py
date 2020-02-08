@@ -6,14 +6,17 @@ from settings import SETTINGS
 from importlib.util import find_spec, module_from_spec
 
 def check_module(module_path):
-    module_spec = find_spec(module_path)
-    return module_spec
+    try:
+        module_spec = find_spec(module_path)
+        return module_spec, None
+    except ModuleNotFoundError as err:   
+        return None, err
 
 def import_module_from_spec(module_spec):
     module = module_from_spec(module_spec)
-    module_spec.loader.exec_module(module)
 
-    if module:
+    if module: 
+        module_spec.loader.exec_module(module)
         return module
     return None
 
@@ -24,22 +27,11 @@ def load_cache():
     from components.chat_settings import get_settings_chat
     from components.cache import save_chat_to_cache
 
-    err = []
-
     for chat_id, _settings in SETTINGS.settings_chat.items():
-        settings_chat = get_settings_chat(
-            chat_id, 
-            _settings.get('type'), 
-            _settings.get('from'), 
-            _settings.get('to'), 
-            _settings.get('included')
-        )
-
+        settings_chat = get_settings_chat(chat_id)
         save_chat_to_cache(chat_id, settings_chat)
 
-    if err == []:
-        return None
-    return err 
+    return None
 
 def load_modules():
     """
@@ -47,21 +39,23 @@ def load_modules():
     """
     from modules.modules import MODULES
 
-    load_name = 'modules'
+    folder_name = 'modulesp'
+    err = []
+    
     for module_name in SETTINGS.active_modules:
-        err = []
-
-        module_spec = check_module(f'{load_name}.{module_name}')
-        init_module = import_module_from_spec(module_spec)
-
-        if not init_module:
-            err.append(f"Модуль {module} не был подключен.")
-        else:
+        module_spec, modul_err = check_module(f'{folder_name}.{module_name}')
+        
+        if module_spec is not None:       
+            init_module = import_module_from_spec(module_spec)
             MODULES.active_modules[module_name] = {
                 "full_name" : module_spec.name,
                 "settings"  : init_module.settings,
                 "path"      : module_spec.loader.path
             }
+        else: 
+            err.append({
+                module_name : modul_err.args[0]
+            })
             
     if err == []:
         return None
@@ -83,18 +77,21 @@ def init_components():
     ```
     Примеры:
     ==> True, None  
-    ==> False, [    
-        Проблемы с cache    - None,
-        Проблемы с модулями - [ Модуль games.flip_and_roll не был подключен. ]
-    ]
+    ==> False, "
+        Проблемы с модулями: 
+        [ 
+            { 'games.flip_and_roll' : '' }
+        ]
+    "
     ```
     """
-
-    err_load_cache    = load_cache()
+     
+    load_cache()
     err_load_modules  = load_modules()
 
-    if err_load_cache is None and err_load_modules is None:
+    if err_load_modules is None:
         return True, None
     else:
-        err = f"Проблемы с cache - {err_load_cache}\nПроблемы с модулями - {err_load_modules}"
+        import json
+        err = "\nПроблемы с модулями:\n" + json.dumps(err_load_modules, indent=4, sort_keys=True)
         return False, err

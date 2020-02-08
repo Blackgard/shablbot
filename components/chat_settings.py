@@ -5,22 +5,22 @@ from components.time_work import _getTime
 
 def get_settings_chat(chat_id, type_time = None, t_from = None, t_to = None, included = None):
     """
-    Функция формирования настроек бота
+    Функция формирования настроек работы бота с беседой (ВК)
 
     Параметры
     ---
     ```
-    int : chat_id   - id чата для которого необходимо собрать настройки
-    str : type_time - время работы чата по часовому признаку (смотреть settings.py - type_time_work)
-    str : t_from    - время работы чата с какого-то конкретного временного значения
-    str : t_to      - время работы чата по какое-то конкретное временное значение
-    str : included  - состояние включенности бота в чате
+    int : chat_id   - id беседы для которого необходимо собрать настройки
+    str : type_time - время работы беседы по часовому признаку (смотреть settings.py - type_time_work)
+    str : t_from    - время работы беседы с какого-то конкретного временного значения
+    str : t_to      - время работы беседы по какое-то конкретное временное значение
+    str : included  - состояние включенности бота в беседе
     ```
 
     Логика работы
     ---
     Функция принимает на вход параметры необходимые для настройки бота. 
-    Если в данную функцию подать id чата, который не указанн в settings.py (settings_chat),
+    Если в данную функцию подать id чата, который не указан в settings.py (settings_chat),
     то для данного чата функция вернет значения из стандартных переменных указанных в settings.py:
         `type_time - (def_time_work, time_zone)`,
         `included  - True`
@@ -76,23 +76,26 @@ def get_settings_chat(chat_id, type_time = None, t_from = None, t_to = None, inc
     """
     chat_id     = int(chat_id)
 
-    for _chat_id, settings_chat in SETTINGS.settings_chat.items():
+    for set_chat_id, settings_chat in SETTINGS.settings_chat.items():
 
-        if _chat_id == chat_id:
-            if type_time is not None:
-                type_time     = type_time.upper()
-                settings_time = (type_time, SETTINGS.time_zone)
+        if set_chat_id == chat_id: 
+            # Нашли id беседы в settings, теперь производим считывание настроек
+            
+            if type_time is None:       
+                settings_time = settings_chat["time_type"]  
+                type_time     = settings_time[0]                  
             else: 
-                settings_time = settings_chat["time_type"]
+                settings_time = (type_time[0].upper(), type_time[1])
+                type_time     = type_time[0].upper() 
+                
 
-            type_time = settings_time[0]
-
-            if included is not None:
-                included  = bool(included)
-                included  = settings_chat["included"]
-            else:
-                included = included
-
+            if included is None:
+                included = settings_chat["included"]   
+                
+            if type_time == "CUSTOM" and t_from is None and t_to is None:
+                t_from  = settings_chat["from"]
+                t_to    = settings_chat["to"]
+            
             break
     
     if type_time == None:
@@ -100,6 +103,7 @@ def get_settings_chat(chat_id, type_time = None, t_from = None, t_to = None, inc
             "time_type" : (SETTINGS.def_time_work, SETTINGS.time_zone),
             "included"  : True            
         }
+
     elif type_time == "CUSTOM":
         t_from  = _getTime(t_from)
         t_to    = _getTime(t_to)
@@ -110,10 +114,10 @@ def get_settings_chat(chat_id, type_time = None, t_from = None, t_to = None, inc
             "to"        : t_to,
             "included"  : included
         }
-
+        
     return {
         "time_type"     : settings_time,
-        "included"      : True
+        "included"      : included
     }
 
 def modify_settings_chat(chat_id, settings):

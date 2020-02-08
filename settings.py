@@ -1,19 +1,31 @@
 """
 Файл с настройками бота, регулировка данного файла позволяет создать своего уникального бота.
 """
-from dataclasses import dataclass
+from dotenv import load_dotenv
+import os
 
-@dataclass(frozen=True)
-class CONST:
+BASE_DIR = os.path.dirname(__file__)
+load_dotenv(dotenv_path=os.path.join(BASE_DIR, ".env"))
+print(os.getenv("TOKEN"))
+
+class SETTINGS:
     """
     Класс хрянящий все неизменяющиеся переменные.
+    
+    Список переменных:\n
+    [ 
+        token, bot_chat_id, def_templ, join_templ, admin_id,
+        def_time_work, time_zone, debug, all_templ, active_modules,
+        answers, type_time_work, time_work_group, command, 
+        list_all_com, prohabilities, templ_and_respons
+    ]
     """
 
     # Токен хранится в виде строки (генерируется в паблике).
-    token           = r""
+    token           = os.getenv("TOKEN")
 
     # Id паблика бота хранится в виде числа. Пример: 123456789
-    bot_chat_id     = 123456789 
+    bot_chat_id     = os.getenv("BOT_CHAT_ID")
 
     # Шаблоны слов, на который бот должен всегда давать какой-либо ответ.
     # Лучше всего сюда поставить имя бота.
@@ -26,7 +38,7 @@ class CONST:
     join_templ      = r"\s.*?"      
 
     # Id администартора бота.
-    admin_id        = 123456789
+    admin_id        = os.getenv("ADMIN_ID")
 
     # Значение времени работы бота, которое устанавливатся по умолчанию для всех чатов. 
     # (Не указанных в settings_chat)
@@ -54,16 +66,17 @@ class CONST:
 
     # Модули дополнения функцианальной возможности бота.
     # Имеется возможность разрабатывать индивидуальные модули , выполненные в определеном формате.
-    # (Смотрите пример модуля 'flip_and_roll.py')
+    # (Смотрите пример модуля "flip_and_roll.py")
     active_modules = [               
-        'games.flip_and_roll'
+        "games.flip_and_roll",
+        'games.hh'
     ]
 
     # Набор всех вариантов ответов на конкретные слова, разбитые по редкости. 
     answers    =  {                 
-        'по умолчанию' : {
+        "по умолчанию" : {
             "common" : [
-                'Я бот.'
+                "Я бот."
             ],
 
             "uncommon" : [
@@ -79,7 +92,7 @@ class CONST:
             ]
         },
 
-        'приветствие' : {
+        "приветствие" : {
 
             "здравствуй": {
                 "common" : [
@@ -96,7 +109,7 @@ class CONST:
             }   
         },
 
-        'прощание' : {
+        "прощание" : {
             
             "пока"          : {
                 "common" : [
@@ -130,16 +143,17 @@ class CONST:
     #   t_from    - время работы бота с какого-то конкретного часа
     #   t_to      - время работы бота по какой-то конкретный час
     # Чтобы понять как задаются данные параметры, необходимо заглянуть в файл components.chat_settings.
-    time_work_group = {            
+    settings_chat = {            
         123456789 : {
             "time_type" : type_time_work[0],
             "included"  : True
         },
 
         123456780 : {
-            "type"  : type_time_work[1],
-            "from"  : "00:00",
-            "to"    : "23:00",
+            "time_type" : type_time_work[1],
+            "from"      : "00:00",
+            "to"        : "23:00",
+            "included"  : True
         }
     }
 
@@ -235,9 +249,9 @@ class CONST:
     # При внесении новых слов и ответов на них необходимо так же в данном 
     # списке предоставить зависимости
     templ_and_respons = {
-        CONST.def_templ[0]                              : CONST.answers['по умолчанию'],
-        CONST.all_templ["приветствие"]['здравствуй']    : CONST.answers["приветствие"]['здравствуй'],
-        CONST.all_templ["приветствие"]['здравствуй']    : CONST.answers["приветствие"]['здравствуй'],
-        CONST.all_templ["прощание"]["пока"]             : CONST.answers['прощание']["пока"],
-        CONST.all_templ["прощание"]["до свидания"]      : CONST.answers['прощание']["до свидания"]
+        def_templ[0]                              : answers["по умолчанию"],
+        all_templ["приветствие"]["здравствуй"]    : answers["приветствие"]["здравствуй"],
+        all_templ["приветствие"]["привет"]        : answers["приветствие"]["привет"],
+        all_templ["прощание"]["пока"]             : answers["прощание"]["пока"],
+        all_templ["прощание"]["до свидания"]      : answers["прощание"]["до свидания"]
     }

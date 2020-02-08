@@ -6,9 +6,9 @@ class MODULES:
     ```
     {
         "module_name" : {
-            "full_name" : 'module_full_name',
-            "settings"  : { 'setting_module' },
-            "path"      : 'module_path'
+            "full_name" : "module_full_name",
+            "settings"  : { "setting_module" },
+            "path"      : "module_path"
         },
         "module_name" : {
             ...

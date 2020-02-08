@@ -3,14 +3,14 @@ from modules.modules import MODULES
 def parse_message_module(message, user_id, chat_id, botAPI):
 
     for module, parameters in MODULES.active_modules.items():
-        settings_module = parameters['settings']
-        templates       = settings_module['templates']
+        settings_module = parameters["settings"]
+        templates       = settings_module["templates"]
         
         found_matches   = find_mathes(message, templates)
 
         if found_matches is not None:
             func          = found_matches
-            entry_point   = settings_module['entry_point']
+            entry_point   = settings_module["entry_point"]
             answer_module = entry_point(
                 func=func
             )

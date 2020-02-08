@@ -73,7 +73,7 @@ def choice_of_answer(found_matches):
     ])
     ==> {
         "common" : [
-                "Simple text it's nice"
+                "Simple text it"s nice"
             ],
 
         "uncommon" : [
@@ -86,13 +86,13 @@ def choice_of_answer(found_matches):
     ```
     """
 
-    answer = ""
+    word_answer = ""
     for index_temp in found_matches:
         for def_templ in SETTINGS.def_templ:
-            answer = index_temp[0].replace(def_templ[0] + SETTINGS.join_templ, "") 
+            word_answer = index_temp[0].replace(def_templ + SETTINGS.join_templ, "") 
 
-    if answer:
-        return SETTINGS.templ_and_respons.get(answer)
+    if word_answer:
+        return SETTINGS.templ_and_respons.get(word_answer)
     return None
 
 def find_matches(message):
@@ -164,7 +164,6 @@ def choise_answer(list_answer, chat_id, botAPI):
     """
     import random
     
-
     prohabilities   = SETTINGS.prohabilities
     actial_proha    = { 
         name_proh : value_proh 
@@ -238,7 +237,7 @@ def handler_message(eventObj, chat_id, botAPI):
             chat_id = chat_id_com_or_mod, 
             botAPI  = botAPI
         )
-    elif CACHE.settings_chat[chat_id]['included'] and on_time is not False:
+    elif CACHE.settings_chat[chat_id]["included"] and on_time is not False:
         found_matches = find_matches(message=message)
 
         if SETTINGS.debug:
@@ -246,8 +245,10 @@ def handler_message(eventObj, chat_id, botAPI):
 
         if found_matches is not None:                
             answers = choice_of_answer(found_matches)
-            choise_answer(
-                answers, 
-                eventObj.peer_id, 
-                botAPI
-            )
+            
+            if answers is not None:
+                choise_answer(
+                    answers, 
+                    eventObj.peer_id, 
+                    botAPI
+                )

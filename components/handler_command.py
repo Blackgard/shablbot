@@ -56,13 +56,13 @@ def execute_public_com(name_com, chat_id, admin_id=SETTINGS.admin_id):
     """
 
     if name_com == SETTINGS.list_all_com[0][0]: # включить бота
-        CACHE.settings_chat[chat_id]['included'] = True
+        CACHE.settings_chat[chat_id]["included"] = True
         print(f"В группе #{chat_id}, бот вкл.")
 
         return chat_id, "Бот был включен"
 
     elif name_com == SETTINGS.list_all_com[1][0]: # выключить бота
-        CACHE.settings_chat[chat_id]['included'] = False
+        CACHE.settings_chat[chat_id]["included"] = False
         print(f"В группе #{chat_id}, бот выкл.")
 
         return chat_id, "Бот был выключен"
@@ -151,8 +151,8 @@ def execute_private_com(command, name_com, bot, chat_id, admin_id=SETTINGS.admin
             chat_id=SETTINGS.bot_chat_id
         )
         
-        for chat in info_chats['items']:
-            chat_id = chat['peer']['id']
+        for chat in info_chats["items"]:
+            chat_id = chat["peer"]["id"]
             if chat_id >= 2000000000:
                 answer_show_grops += f"{chat['chat_settings']['title']} - {chat_id}\n"
 

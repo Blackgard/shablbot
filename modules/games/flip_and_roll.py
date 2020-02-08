@@ -19,7 +19,7 @@ def activate_module(func, chat_id=None, def_answer=None, user_id=None, botAPI=No
     """
     Входная точка модуля.
     """
-    active_func = settings['func'].get(func)[0]
+    active_func = settings["func"].get(func)[0]
 
     answer_module = def_answer or ""
     if active_func:
@@ -44,10 +44,10 @@ def getSettings():
         },
         "templates"     : {
             "flip" : [
-                r'флип'
+                r"флип"
             ],
             "roll" : [
-                r'ролл'
+                r"ролл"
             ]
         }
     ```
@@ -66,10 +66,10 @@ settings = {
     },
     "templates"     : {
         "flip" : [
-            r'флип'
+            r"флип"
         ],
         "roll" : [
-            r'ролл'
+            r"ролл"
         ]
     }
 }
