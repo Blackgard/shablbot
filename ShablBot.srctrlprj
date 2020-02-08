@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<config>
+    <source_groups>
+        <source_group_961cc243-615d-49c9-8ee0-67448b7a6f39>
+            <name>Python Source Group</name>
+            <python_environment_path>env</python_environment_path>
+            <source_extensions>
+                <source_extension>.py</source_extension>
+            </source_extensions>
+            <source_paths>
+                <source_path>setup.py</source_path>
+                <source_path>LICENSE</source_path>
+                <source_path>MANIFEST.in</source_path>
+                <source_path>README.md</source_path>
+                <source_path>README.rst</source_path>
+                <source_path>requirements.txt</source_path>
+                <source_path>run_bot.py</source_path>
+                <source_path>settings.py</source_path>
+                <source_path>setup.py</source_path>
+                <source_path>ShablBot.srctrlbm</source_path>
+                <source_path>ShablBot.srctrldb</source_path>
+                <source_path>ShablBot.srctrlprj</source_path>
+                <source_path>components</source_path>
+                <source_path>modules</source_path>
+            </source_paths>
+            <status>enabled</status>
+            <type>Python Source Group</type>
+        </source_group_961cc243-615d-49c9-8ee0-67448b7a6f39>
+    </source_groups>
+    <version>8</version>
+</config>

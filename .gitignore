@@ -8,3 +8,5 @@ MANIFEST.in
 README.rst  
 # else
 tests  
+*.yml
+ShanlBot*
