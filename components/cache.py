@@ -1,16 +1,54 @@
 import datetime as dt
 from collections import Counter
 
+from functools import lru_cache
+from .decorators import freezeargs
+
 from settings import SETTINGS
 class CACHE:
     """
     Класс реализующий функционал кэширования данных необходимых для работы бота
     """
-    settings_chat  = {} 
-    counter_word    = {}
+
+    _settings_chat = {}
+    _counter_word = {}
+        
+    @classmethod
+    def set_settings_chat(cls, id_chat, settings):
+        try:
+            cls._settings_chat[id_chat] = settings
+            return True
+        except:
+            return False
+        
+    @classmethod    
+    def get_settings_chat(cls, id_chat=None):
+        if id_chat:
+            return cls._settings_chat.get(id_chat)
+        else:
+            return cls._settings_chat
+    
+    @classmethod
+    def set_counter_word(cls, id_chat, word):
+        cls._counter_word[id_chat] += Counter([word])
+        
+    @classmethod    
+    def init_counter_word(cls, id_chat):
+        cls._counter_word[id_chat] = Counter()
+        
+    @classmethod    
+    def get_counter_word(cls, id_chat=None):
+        print(cls._counter_word)
+        if id_chat:
+            return cls._counter_word.get(id_chat)
+        else:
+            return cls._counter_word
+        
 
 from components.chat_settings import get_settings_chat
 
+@freezeargs
+@lru_cache(maxsize=SETTINGS.def_size_cache,typed=False)
 def save_chat_to_cache(chat_id, settings = None):
     """
     Функция задает начальные правила для работы бота с новой группой
@@ -23,14 +61,22 @@ def save_chat_to_cache(chat_id, settings = None):
     ```
     """
 
-    find_chat = CACHE.settings_chat.get(chat_id)
+    find_chat = CACHE.get_settings_chat(chat_id)
     try:
         if find_chat is None:
+            
             if settings:
-                CACHE.settings_chat[chat_id] = settings
+                CACHE.set_settings_chat(
+                    chat_id, 
+                    settings
+                )
             else:    
-                CACHE.settings_chat[chat_id] = get_settings_chat(chat_id) 
-            CACHE.counter_word[chat_id]    = Counter()
+                CACHE.set_settings_chat(
+                    chat_id, 
+                    get_settings_chat(chat_id)
+                ) 
+                
+            CACHE.init_counter_word(chat_id)
 
             if SETTINGS.debug:
                 print(f"Была сохранена группа #{chat_id}")
@@ -38,9 +84,10 @@ def save_chat_to_cache(chat_id, settings = None):
         return False
     return True
 
+@lru_cache(maxsize=SETTINGS.def_size_cache,typed=False)
 def add_single_value_counter_chat(chat_id, type_word):
     try:
-        CACHE.counter_word[chat_id] += Counter([type_word])
+        CACHE.set_counter_word(chat_id, type_word)
         return True
     except:
         return False

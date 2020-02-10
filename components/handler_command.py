@@ -1,6 +1,6 @@
 from settings import SETTINGS
 from components.cache import CACHE
-
+import logging
 def parse_message_com(message, user_id, chat_id, botAPI):
     """
     Проверка полученного сервервером сообщение на наличие команд.
@@ -56,20 +56,26 @@ def execute_public_com(name_com, chat_id, admin_id=SETTINGS.admin_id):
     """
 
     if name_com == SETTINGS.list_all_com[0][0]: # включить бота
-        CACHE.settings_chat[chat_id]["included"] = True
+        sett_chat = CACHE.get_settings_chat(chat_id)
+        sett_chat['included'] = True
+        
+        CACHE.set_settings_chat(chat_id,  sett_chat)
         print(f"В группе #{chat_id}, бот вкл.")
 
         return chat_id, "Бот был включен"
 
     elif name_com == SETTINGS.list_all_com[1][0]: # выключить бота
-        CACHE.settings_chat[chat_id]["included"] = False
+        sett_chat = CACHE.get_settings_chat(chat_id)
+        sett_chat['included'] = False
+        
+        CACHE.set_settings_chat(chat_id,  sett_chat)
         print(f"В группе #{chat_id}, бот выкл.")
 
         return chat_id, "Бот был выключен"
 
     elif name_com == SETTINGS.list_all_com[2][0]: # покажи стат группы
         answer_stat_chat = ""
-        for type_phrases, count in CACHE.counter_word[chat_id].most_common():
+        for type_phrases, count in CACHE.get_counter_word(chat_id).most_common():
             answer_stat_chat += f"Сообщение с редкостью {type_phrases} встречалась {count} раз \n"
         print(f"Группа #{chat_id}, запросила статистику по словам.")
 
@@ -79,8 +85,8 @@ def execute_public_com(name_com, chat_id, admin_id=SETTINGS.admin_id):
         return chat_id, answer_stat_chat
 
     answer_error = "Ошибка, команда не была найдена"
-    if SETTINGS.debug:
-        print(answer_error)
+    logging.warning(answer_error)
+    
     return admin_id, answer_error
 
 def execute_private_com(command, name_com, bot, chat_id, admin_id=SETTINGS.admin_id):
@@ -97,7 +103,7 @@ def execute_private_com(command, name_com, bot, chat_id, admin_id=SETTINGS.admin
         return admin_id, answer_com_help.title()
 
     elif name_com == SETTINGS.list_all_com[4][0]: # покажи всю стат
-        answer_com_stat = CACHE.counter_word
+        answer_com_stat = CACHE.get_counter_word()
         print(f"Администратор id{admin_id}, запросил всю статистику по словам.")
         
         return admin_id, answer_com_stat
@@ -145,7 +151,7 @@ def execute_private_com(command, name_com, bot, chat_id, admin_id=SETTINGS.admin
         answer_show_grops = ""
         
         info_chats = bot.messages.getConversationsById(
-            peer_ids=[*(CACHE.settings_chat.keys())],
+            peer_ids=[*(CACHE.get_settings_chat().keys())],
             extended=1,
             fields=["title"],
             chat_id=SETTINGS.bot_chat_id

@@ -1,7 +1,11 @@
 import sys
 
 from settings         import SETTINGS
-from components.cache import *
+from components.cache import (  
+    add_single_value_counter_chat, 
+    save_chat_to_cache, 
+    CACHE
+)
 
 from components.time_work       import check_work_time
 from components.handler_command import parse_message_com
@@ -48,7 +52,7 @@ def write_msg(answer, chat_id, botAPI):
         print("При отправке сообщения произошла ошибка")
     
     if SETTINGS.debug:
-        print(f"Было отправленно сообщение: {answer} - группа: {chat_id}")
+        print(f"Было отправленно сообщение: '{answer}' (id беседы: {chat_id})")
 
 
 def choice_of_answer(found_matches):
@@ -222,7 +226,7 @@ def handler_message(eventObj, chat_id, botAPI):
     """
     
     message     = eventObj.text.lower()
-    state_save  = save_chat_to_cache(chat_id)
+    save_chat_to_cache(chat_id)
     on_time     = check_work_time(chat_id)
 
     chat_id_com_or_mod, answer_com_or_module = check_on_com_and_module(
@@ -237,8 +241,8 @@ def handler_message(eventObj, chat_id, botAPI):
             chat_id = chat_id_com_or_mod, 
             botAPI  = botAPI
         )
-    elif CACHE.settings_chat[chat_id]["included"] and on_time is not False:
-        found_matches = find_matches(message=message)
+    elif CACHE.get_settings_chat(chat_id)["included"] and on_time is not False:
+        found_matches = find_matches(message)
 
         if SETTINGS.debug:
             print(f"Найденные совпадения: {found_matches}")

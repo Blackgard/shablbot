@@ -10,15 +10,15 @@ def _getTime(time):
 
 def check_work_time(chat_id):
     # TODO: ПЕРЕДЕЛАТЬ ДАННЫЙ БЛОК 
-    chat_time_type = CACHE.settings_chat.get(chat_id)["time_type"]
+    chat_time_type = CACHE.get_settings_chat(chat_id)["time_type"]
 
     if chat_time_type[0] == SETTINGS.type_time_work[0][0]: # ALL
         return True
     
     elif chat_time_type[0] == SETTINGS.type_time_work[1][0]: #CUSTOM 
-        time_zone = dt.now(timezone(CACHE.settings_chat[chat_id]["time_type"][1]))
-        time_from = CACHE.settings_chat[chat_id]["from"]
-        time_to   = CACHE.settings_chat[chat_id]["to"]
+        time_zone = dt.now(timezone(CACHE.get_settings_chat(chat_id)["time_type"][1]))
+        time_from = CACHE.get_settings_chat(chat_id)["from"]
+        time_to   = CACHE.get_settings_chat(chat_id)["to"]
 
         if time_from <= time_zone.time() <= time_to:
             return True
@@ -40,8 +40,8 @@ def check_work_time(chat_id):
         t_msk_DAY = [9, 22]
         
         time_msk_day  = dt.now(timezone(SETTINGS.type_time_work[3][1]))
-        time_from    = t_msk_NGT[0]
-        time_to      = t_msk_NGT[1]
+        time_from    = t_msk_DAY[0]
+        time_to      = t_msk_DAY[1]
 
         if time_from <= time_msk_day.time() <= time_to:
             return True

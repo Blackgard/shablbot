@@ -1,7 +1,11 @@
+# -*- coding: utf-8 -*-
+
 from settings import SETTINGS
 from components.handler_message import handler_message
 from components.init_bot import init_components
-import coloredlogs, logging
+import logs.log_settings 
+import logging
+
 
 def run_server(*args):
     """
@@ -15,18 +19,13 @@ def run_server(*args):
     bot_session = api.VkApi(token=SETTINGS.token)
     botAPI      = bot_session.get_api()
     longpoll    = VkBotLongPoll(bot_session, SETTINGS.bot_chat_id)
-    
-    if SETTINGS.debug:
-        coloredlogs.install(level='DEBUG')
-    else:
-        coloredlogs.install(level='INFO')
-        
+  
     state_init, err_init = init_components()
 
     if not state_init:          
         logging.warning(err_init)
-
-    print("------- Бот запущен / Bot is runing -------")
+    
+    logging.info("------- Бот запущен / Bot is runing -------")
     try:
         for event in longpoll.listen():
             if event.type == VkBotEventType.MESSAGE_NEW:	

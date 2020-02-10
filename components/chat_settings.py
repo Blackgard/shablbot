@@ -1,6 +1,3 @@
-from settings import SETTINGS
-from components.cache import CACHE
-
 from components.time_work import _getTime
 
 def get_settings_chat(chat_id, type_time = None, t_from = None, t_to = None, included = None):
@@ -74,6 +71,8 @@ def get_settings_chat(chat_id, type_time = None, t_from = None, t_to = None, inc
     }
     ```
     """
+    from settings import SETTINGS
+
     chat_id     = int(chat_id)
 
     for set_chat_id, settings_chat in SETTINGS.settings_chat.items():
@@ -149,9 +148,11 @@ def modify_settings_chat(chat_id, settings):
     ==> False
     ```
     """
+    from components.cache import CACHE
+    
     try:
         if settings:
-            CACHE.settings_chat[chat_id] = settings
+            CACHE.set_settings_chat(chat_id, settings)
             return True
         else:
             return False
