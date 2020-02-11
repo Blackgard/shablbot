@@ -1,4 +1,6 @@
 import datetime as dt
+import logging
+
 from collections import Counter
 
 from functools import lru_cache
@@ -44,7 +46,6 @@ class CACHE:
         else:
             return cls._counter_word
         
-
 from components.chat_settings import get_settings_chat
 
 @freezeargs
@@ -79,15 +80,16 @@ def save_chat_to_cache(chat_id, settings = None):
             CACHE.init_counter_word(chat_id)
 
             if SETTINGS.debug:
-                print(f"Была сохранена группа #{chat_id}")
+                logging.debug(f"Была сохранена группа id{chat_id}")
     except:
         return False
     return True
 
-@lru_cache(maxsize=SETTINGS.def_size_cache,typed=False)
+#@lru_cache(maxsize=SETTINGS.def_size_cache,typed=False)
 def add_single_value_counter_chat(chat_id, type_word):
     try:
         CACHE.set_counter_word(chat_id, type_word)
         return True
     except:
+        logging.error(f"Не удалось добавить уникальное слово для id{chat_id}.")
         return False

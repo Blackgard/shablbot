@@ -1,4 +1,5 @@
 import sys
+import logging
 
 from settings         import SETTINGS
 from components.cache import (  
@@ -25,7 +26,7 @@ def write_msg(answer, chat_id, botAPI):
     ```
     str    : answer   - ответ бота на полученное сообщение
     int    : chat_id  - id группы в которое необходимо отправить сообщение
-    object : botAPI   - обьект позволяющий обращаться от имени бота к VkApi.
+    object : botAPI   - объект позволяющий обращаться от имени бота к VkApi.
     ```
 
     Примеры
@@ -35,7 +36,7 @@ def write_msg(answer, chat_id, botAPI):
 
     write_msg("Answer", 123456789, botAPI)
     ==> None 
-    Сообщение было отправленно
+    Сообщение было отправлено
 
     write_msg("Answer", None, None)
     ==> None
@@ -49,10 +50,10 @@ def write_msg(answer, chat_id, botAPI):
             random_id   = get_random_id()
         )
     except:
-        print("При отправке сообщения произошла ошибка")
+        logging.error(f"При отправке сообщения: {answer} (id{chat_id}) произошла ошибка")
     
     if SETTINGS.debug:
-        print(f"Было отправленно сообщение: '{answer}' (id беседы: {chat_id})")
+        logging.debug(f"Было отправлено сообщение: '{answer}' (id беседы: {chat_id})")
 
 
 def choice_of_answer(found_matches):
@@ -101,7 +102,7 @@ def choice_of_answer(found_matches):
 
 def find_matches(message):
     """
-    Поиск в тексте слов из шаблонов находящихся в "SETTINGS.all_templ" для ответа.
+    Поиск в тексте слов из шаблонов находящихся в "SETTINGS.all_temps" для ответа.
 
     Параметры
     ---
@@ -138,7 +139,7 @@ def find_matches(message):
         if bool(find_def):
             find.append( (def_tmp, find_def[0]) )
 
-    for _, value in SETTINGS.all_templ.items():
+    for _, value in SETTINGS.all_temps.items():
         for _, template in value.items():
             for def_tmp in default_tmps:
                 find_templ = def_tmp + join_tmp + template
@@ -149,11 +150,10 @@ def find_matches(message):
 
     if bool(find):
         return find
-    else:
-        return None
+    return None
 
 
-def choise_answer(list_answer, chat_id, botAPI):
+def preprocessing_message(list_answer, chat_id, botAPI):
     """
     Функция выбора варианта ответа из представленного в первом параметре списка.\n
     Чем ближе список к концу, тем реже встречаются данные ответы.
@@ -161,11 +161,12 @@ def choise_answer(list_answer, chat_id, botAPI):
     Параметры
     ---
     ```
-    dict   : list_answer - все доступные варинаты ответа на найденые совпадения с ключивыми словами
+    dict   : list_answer - все доступные варианты ответа на найденные совпадения с ключивыми словами
     int    : chat_id     - группа или человек от которого сервер получил сообщение
-    object : botAPI      - обьект позволяющий обращаться от имени бота к VkApi.
+    object : botAPI      - объект позволяющий обращаться от имени бота к VkApi.
     ```
     """
+    # TODO: переработать данный блок по причине повторения
     import random
     
     prohabilities   = SETTINGS.prohabilities
@@ -219,9 +220,9 @@ def handler_message(eventObj, chat_id, botAPI):
     Параметры
     ----------
     ```
-    dict   : eventObj - обьект VkApi хранящий в себе все данные о принятом сервером сообщении
+    dict   : eventObj - объект VkApi хранящий в себе все данные о принятом сервером сообщении
     int    : chat_id  - группа или человек от которого сервер получил сообщение
-    object : botAPI   - обьект позволяющий обращаться от имени бота к VkApi
+    object : botAPI   - объект позволяющий обращаться от имени бота к VkApi
     ```
     """
     
@@ -245,13 +246,13 @@ def handler_message(eventObj, chat_id, botAPI):
         found_matches = find_matches(message)
 
         if SETTINGS.debug:
-            print(f"Найденные совпадения: {found_matches}")
+            logging.debug(f"Найденные совпадения: {found_matches}")
 
         if found_matches is not None:                
             answers = choice_of_answer(found_matches)
             
             if answers is not None:
-                choise_answer(
+                preprocessing_message(
                     answers, 
                     eventObj.peer_id, 
                     botAPI

@@ -1,4 +1,0 @@
-2020-02-10 23:40:43,813 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): api.vk.com:443
-2020-02-10 23:40:44,138 - urllib3.connectionpool - DEBUG - https://api.vk.com:443 "POST /method/groups.getLongPollServer HTTP/1.1" 200 125
-2020-02-10 23:40:44,332 - root - INFO - ------- Бот запущен / Bot is runing -------
-2020-02-10 23:40:44,337 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): lp.vk.com:443

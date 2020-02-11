@@ -5,8 +5,10 @@ env/
 .env
 __pycache__
 components/__pycache__
+# readme file and test
 MANIFEST.in
 README.rst  
-
-azure-pipelines.*
 tests/
+# logs and azure
+azure-pipelines.*
+*.log

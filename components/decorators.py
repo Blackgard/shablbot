@@ -2,11 +2,6 @@ import functools
 from frozendict import frozendict
 
 def freezeargs(func):
-    """Transform mutable dictionnary
-    Into immutable
-    Useful to be compatible with cache
-    """
-
     @functools.wraps(func)
     def wrapped(*args, **kwargs):
         args = tuple([frozendict(arg) if isinstance(arg, dict) else arg for arg in args])

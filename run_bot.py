@@ -30,13 +30,12 @@ def run_server(*args):
         for event in longpoll.listen():
             if event.type == VkBotEventType.MESSAGE_NEW:	
                 handler_message(
-                    event.obj,          # Весь обьект класса event (вся информация об полученном сообщении)
-                    event.obj.peer_id,  # id чата откуда было полученно сообщение
+                    event.obj,          # Весь объект класса event (вся информация об полученном сообщении)
+                    event.obj.peer_id,  # Id чата откуда было получено сообщение
                     botAPI              # API для работы с действиями бота
                 )    
     except ConnectionError as err:
-        print("Произошел разрыв соединения с сервером, лог об ошибке ниже:")
-        print(err)
+        logging.error("Произошел разрыв соединения с сервером.\n" + err)
 
 if __name__ == "__main__":
     import sys

@@ -1,9 +1,11 @@
 from settings import SETTINGS
 from components.cache import CACHE
 import logging
+import json
+
 def parse_message_com(message, user_id, chat_id, botAPI):
     """
-    Проверка полученного сервервером сообщение на наличие команд.
+    Проверка полученного сервером сообщения на наличие команд.
 
     `:param: (str) message`  - обрабатываемое сообщение\n
     `:param: (int) user_id`  - id пользователя отправившего сообщение\n
@@ -60,7 +62,7 @@ def execute_public_com(name_com, chat_id, admin_id=SETTINGS.admin_id):
         sett_chat['included'] = True
         
         CACHE.set_settings_chat(chat_id,  sett_chat)
-        print(f"В группе #{chat_id}, бот вкл.")
+        logging.info(f"id{chat_id} - бот был включен.")
 
         return chat_id, "Бот был включен"
 
@@ -69,7 +71,7 @@ def execute_public_com(name_com, chat_id, admin_id=SETTINGS.admin_id):
         sett_chat['included'] = False
         
         CACHE.set_settings_chat(chat_id,  sett_chat)
-        print(f"В группе #{chat_id}, бот выкл.")
+        logging.info(f"id{chat_id} - бот был выключен.")
 
         return chat_id, "Бот был выключен"
 
@@ -77,7 +79,7 @@ def execute_public_com(name_com, chat_id, admin_id=SETTINGS.admin_id):
         answer_stat_chat = ""
         for type_phrases, count in CACHE.get_counter_word(chat_id).most_common():
             answer_stat_chat += f"Сообщение с редкостью {type_phrases} встречалась {count} раз \n"
-        print(f"Группа #{chat_id}, запросила статистику по словам.")
+        logging.info(f"id{chat_id} - запросила статистику по словам.")
 
         if not bool(answer_stat_chat):
             answer_stat_chat = "Не было найдено совпадений, напишите что-нибудь"
@@ -85,7 +87,8 @@ def execute_public_com(name_com, chat_id, admin_id=SETTINGS.admin_id):
         return chat_id, answer_stat_chat
 
     answer_error = "Ошибка, команда не была найдена"
-    logging.warning(answer_error)
+    if SETTINGS.debug:
+        logging.warning(answer_error)
     
     return admin_id, answer_error
 
@@ -98,26 +101,36 @@ def execute_private_com(command, name_com, bot, chat_id, admin_id=SETTINGS.admin
         for com, description in SETTINGS.list_all_com:
             if com == SETTINGS.list_all_com[3][0]:
                 continue
-            answer_com_help += f"  {com} - {description}.\n\n"
+            answer_com_help += f"{com} - {description}.\n\n"
 
-        return admin_id, answer_com_help.title()
+        return admin_id, answer_com_help.capitalize()
 
     elif name_com == SETTINGS.list_all_com[4][0]: # покажи всю стат
-        answer_com_stat = CACHE.get_counter_word()
-        print(f"Администратор id{admin_id}, запросил всю статистику по словам.")
+        counter_word_all = CACHE.get_counter_word()
+        counter_array = []
+        
+        for id_group, counter in counter_word_all.items():
+             counter_array.append( {id_group : dict(counter)} )   
+        
+        answer_com_stat = json.dumps(counter_array, indent=4, sort_keys=True)
+        logging.info(f"Админ id{admin_id} - запросил всю статистику по словам.")
         
         return admin_id, answer_com_stat
 
     elif name_com == SETTINGS.list_all_com[5][0]: # сменить время работы группы {id_chats}
 
         import re
+        
         from components.chat_settings import get_settings_chat, modify_settings_chat
 
         answer_swap_time_work = ""
-        error_message =  "Время работы группы не было изменено. Проверьте правильность введенных данных."
+        error_message =  """
+        Время работы группы не было изменено. Проверьте правильность введенных данных.
+        Шаблон : сменить время 123456789 c 00:00 по 8:00
+        """
         try:
             args_command  = command.split()
-            params_command = [ "CUSTOM" ]
+            params_command = [ ("CUSTOM", SETTINGS.time_zone) ]
 
             for arg in args_command:
                 if arg.isdigit() or re.search(":", arg):
@@ -131,20 +144,26 @@ def execute_private_com(command, name_com, bot, chat_id, admin_id=SETTINGS.admin
                 t_from=params_command[2],
                 t_to=params_command[3]
             )
-        except:
+        except Exception as err:
             answer_swap_time_work = error_message
+            if SETTINGS.debug:
+                logging.debug(f"handler_command.execute_private_com:\n\tparams_command -> {params_command},\n\terror -> {err}")
             return admin_id, answer_swap_time_work
         
-        err_on_swap = modify_settings_chat(
+        if SETTINGS.debug:
+                logging.debug(f"handler_command.execute_private_com:\n\tparams_command -> {params_command},\n\tnew_settings_chat -> {new_settings_chat}")
+        
+        isModify = modify_settings_chat(
             modify_chat_id, 
             new_settings_chat
         )
 
-        if err_on_swap:
-            answer_swap_time_work = f"Время работы группы {modify_chat_id} было успешно сменено."
+        if isModify:
+            answer_swap_time_work = f"Время работы группы @[id{modify_chat_id}|{modify_chat_id}] было успешно сменено."
+            logging.info(f"id{chat_id} сменил время работы группы id{modify_chat_id} [с {new_settings_chat['from'].strftime('%H:%M')} по {new_settings_chat['to'].strftime('%H:%M')}]")
         else:
             answer_swap_time_work = error_message
-
+        
         return admin_id, answer_swap_time_work
 
     elif name_com == SETTINGS.list_all_com[6][0]: # покажи id групп
@@ -157,20 +176,29 @@ def execute_private_com(command, name_com, bot, chat_id, admin_id=SETTINGS.admin
             chat_id=SETTINGS.bot_chat_id
         )
         
-        for chat in info_chats["items"]:
-            chat_id = chat["peer"]["id"]
-            if chat_id >= 2000000000:
-                answer_show_grops += f"{chat['chat_settings']['title']} - {chat_id}\n"
+        for number_chat in range(info_chats["count"]):
+            chat_info = info_chats['items'][number_chat]
+            prof_info = info_chats['profiles'][number_chat]
+            
+            chat_id = chat_info["peer"]["id"]
+            isUser  = chat_info["peer"]['type'] == 'user'
+            
+            if isUser:
+                answer_show_grops += f"[user] {prof_info['first_name']} {prof_info['last_name']} - @[id{prof_info['id']}|{prof_info['id']}]\n"
+            else:
+                answer_show_grops += f"[chat] { chat_info['chat_settings']['title']} - @[id{chat_id}|{chat_id}]\n"
 
         if not answer_show_grops:
             answer_show_grops = "Бот еще не сохранил ни одну группу"
+            if SETTINGS.debug:
+                logging.debug(info_chats)
 
         return admin_id, answer_show_grops
     
-    else:
-        answer_error = "Ошибка, команда не была найдена"
+    
+    answer_error = "Ошибка, команда не была найдена"
 
-        if SETTINGS.debug:
-            print(answer_error)
+    if SETTINGS.debug:
+        logging.warning(answer_error)
 
-        return admin_id, answer_error
+    return admin_id, answer_error

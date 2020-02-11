@@ -1,27 +1,27 @@
-def flip(def_answer=None):
+def flip():
     from random import choice
 
     result_random = choice([True, False])
-    answer_on_flip = def_answer or ""
+    answer_on_flip = ""
     answer_on_flip += "Peшка" if result_random else "Орел"
 
     return answer_on_flip
 
-def roll(def_answer=None):
+def roll():
     from random import randint
 
-    answer_on_roll = def_answer or ""
+    answer_on_roll = ""
     answer_on_roll += f"Тебе сегодня прилетает {randint(1,100)}"
 
     return answer_on_roll
 
-def activate_module(func, chat_id=None, def_answer=None, user_id=None, botAPI=None):
+def activate_module(func, *args, **kwargs):
     """
     Входная точка модуля.
     """
     active_func = settings["func"].get(func)[0]
 
-    answer_module = def_answer or ""
+    answer_module = ""
     if active_func:
         answer_module = active_func()
 

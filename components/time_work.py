@@ -5,8 +5,9 @@ from settings import SETTINGS
 from components.cache import CACHE
 
 def _getTime(time):
+    date = dt.now()
     hour, minute = time.split(":")
-    return dt(2009, 12, 1, int(hour), int(minute)).time()
+    return dt(date.year, date.month, date.day, int(hour), int(minute)).time()
 
 def check_work_time(chat_id):
     # TODO: ПЕРЕДЕЛАТЬ ДАННЫЙ БЛОК 
