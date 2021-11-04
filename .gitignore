@@ -1,14 +1,11 @@
-# ignore IDE garbage
-.vscode/
-# ignore python cache and lib
-env/
-.env
-__pycache__
-components/__pycache__
-# readme file and test
-MANIFEST.in
-README.rst  
-tests/
-# logs and azure
-azure-pipelines.*
+# logs
 *.log
+
+
+# pip files
+/build
+/dist
+/shablbot.egg-info
+
+# cmd build commands
+build.cmd

@@ -1,0 +1,12 @@
+include LICENSE
+
+include shablbot/init/keyboards/*.json
+include shablbot/init/modules/*.json
+include shablbot/init/phrases/*.json
+include shablbot/init/settings/*.json
+include shablbot/init/commands/*.json
+
+include images/shablbot.png
+include images/github.svg
+include images/vk.svg
+include images/instagram.svg
