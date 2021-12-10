@@ -6,7 +6,9 @@ import loguru
 from pathlib import Path
 
 from shablbot.settings.settings_model import SettingsModel
-from shablbot.core.utils import render_state, ColorText
+
+from shablbot.core.color import ColorText
+from shablbot.core.utils import render_state
 
 
 class Keyboard:

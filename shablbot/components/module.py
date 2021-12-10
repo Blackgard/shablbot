@@ -11,7 +11,8 @@ from importlib.util import find_spec, module_from_spec
 from shablbot.models.module import ModuleSettings
 from shablbot.settings.settings_model import SettingsModel
 
-from shablbot.core.utils import render_state, ColorText
+from shablbot.core.color import ColorText
+from shablbot.core.utils import render_state
 
 
 class Module:

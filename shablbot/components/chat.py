@@ -13,7 +13,8 @@ from shablbot.settings.settings_model import (
     ChatSettingsBody,
 )
 
-from shablbot.core.utils import render_state, ColorText
+from shablbot.core.color import ColorText
+from shablbot.core.utils import render_state
 
 
 class Chat:
@@ -159,6 +160,7 @@ class Chats:
 
     def __get_info_chat(self, chat_id: str) -> Optional[Dict[str, Any]]:
         return self.__botAPI.messages.getConversationsById(peer_ids=chat_id).get('items', [None])[0]
+
 
     def get_chat(self, chat_id: str, add_is_not_exist=False) -> Optional[Chat]:
         """Get chat object by id.

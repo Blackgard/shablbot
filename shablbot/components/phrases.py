@@ -11,7 +11,8 @@ import loguru
 from shablbot.models.phrases import PhraseBody, PhraseBodyWord
 from shablbot.settings.settings_model import SettingsModel
 
-from shablbot.core.utils import render_state, ColorText
+from shablbot.core.color import ColorText
+from shablbot.core.utils import render_state
 
 class Phrase:
     def __init__(self, phrase_path_file: str, logger: loguru.logger) -> None:

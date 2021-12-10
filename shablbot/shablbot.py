@@ -103,7 +103,9 @@ class ShablBot:
         event_object = VkBotMessageEventModel(**event.object)
 
         chat_work: Chat = self.chats.get_chat(
-            event_object.message.peer_id, add_is_not_exist=True
+            event_object.message.peer_id,
+            add_is_not_exist=True,
+            vk_message_event=event_object
         )
         if not chat_work.is_premitted_work():
             return False

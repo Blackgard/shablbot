@@ -13,7 +13,8 @@ from shablbot.components.chat import Chat
 from shablbot.settings.settings_model import SettingsModel
 from shablbot.models.command import CommandSettings
 
-from shablbot.core.utils import render_state, ColorText
+from shablbot.core.color import ColorText
+from shablbot.core.utils import render_state
 
 
 class Command:
