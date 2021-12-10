@@ -104,8 +104,7 @@ class ShablBot:
 
         chat_work: Chat = self.chats.get_chat(
             event_object.message.peer_id,
-            add_is_not_exist=True,
-            vk_message_event=event_object
+            add_is_not_exist=True
         )
         if not chat_work.is_premitted_work():
             return False
