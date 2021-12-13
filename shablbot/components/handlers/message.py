@@ -1,6 +1,5 @@
-from typing import List, Optional, Tuple
+from typing import Optional
 
-import re
 import random
 import loguru
 
@@ -74,12 +73,13 @@ class MessageHandler:
             if chat.is_person and phrase.group == "default": continue
 
             preffix = ""
-            if chat.is_chat: preffix = f"{default_templates}{join_tmp}"
+            if chat.is_chat:
+                preffix = [f"{def_tem}{join_tmp}" for def_tem in default_templates]
 
             matched_phrase[phrase.group] = phrase.find_match_with_message(processed_message, preffix=preffix)
 
         # clear empty item
-        matched_phrase = { k:v for k,v in matched_phrase.items() if v}
+        matched_phrase = {k:v for k,v in matched_phrase.items() if v}
 
         return FoundPhrasesByGroups(
             len=len(matched_phrase.keys()),

@@ -2,7 +2,7 @@
 ShablBot - is easy bot for your project.
 """
 
-from typing import Optional
+from typing import Optional, Union
 
 import random
 import loguru
@@ -88,6 +88,22 @@ class ShablBot:
         except requests.exceptions.ConnectionError as error:
             self.logger.error(f"VkBotLongPoll not create. Error: {error}")
 
+    def __get_event_object(self, event: VkBotMessageEvent) -> Union[VkBotMessageEventModel, bool]:
+        """ Get a model of a VK object by data type
+
+        Args:
+            event (VkBotMessageEvent): Object VkApi that stores all the data about the message received by the server
+
+        Returns:
+            Union[VkBotMessageEventModel, bool]: Pydantic model with data or nothing
+        """
+        allowed_events = {
+            VkBotEventType.MESSAGE_REPLY: lambda _: False,
+            VkBotEventType.MESSAGE_NEW: VkBotMessageEventModel.parse_obj,
+            # ... and more event type
+        }
+        return allowed_events.get(event.type, lambda _: False)(event.object)
+
     def __process_event(self, event: VkBotMessageEvent) -> bool:
         """Function for process get message from vk chat
 
@@ -97,10 +113,8 @@ class ShablBot:
         Returns:
             is_processed (bool): Is processed event or not
         """
-        if event.type == VkBotEventType.MESSAGE_REPLY:
-            return False
-
-        event_object = VkBotMessageEventModel(**event.object)
+        event_object = self.__get_event_object(event)
+        if not event_object: return
 
         chat_work: Chat = self.chats.get_chat(
             event_object.message.peer_id,

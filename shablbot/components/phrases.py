@@ -1,9 +1,7 @@
-
-
 from __future__ import annotations
-import re
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Union
 
+import re
 import os
 import json
 import loguru
@@ -13,6 +11,7 @@ from shablbot.settings.settings_model import SettingsModel
 
 from shablbot.core.color import ColorText
 from shablbot.core.utils import render_state
+
 
 class Phrase:
     def __init__(self, phrase_path_file: str, logger: loguru.logger) -> None:
@@ -41,26 +40,46 @@ class Phrase:
             self.logger.error(f"Could not load phrase file -> '{self.phrase_path_file}' |\n err -> {err}")
         return None
 
-    def find_match_with_message(self, processed_message: str, preffix: str = "") -> List[PhraseBodyWord]:
+    def __findall(self, message, word_body, processed_message, matched_list) -> None:
+        """ Find all match for message from chat
+
+        Args:
+            message ([type]): expected message
+            word_body ([type]): processed word
+            processed_message ([type]): processed_message
+            matched_list ([type]): list matched with words
+        """
+        if re.findall(message, processed_message):
+            matched_list.append(word_body)
+
+    def find_match_with_message(self, processed_message: str, preffix: Union[str, List[str]] = "") -> List[PhraseBodyWord]:
         """Find a match with a message.
 
         Args:
             processed_message (str): string fo find template.
-            preffix (str, optional): Prefixx to phrase. Defaults to "".
+            preffix (str, List[str], optional): Prefixx to phrase. Defaults to "".
 
         Returns:
             List[PhraseBodyWord]: List mached phrases.
         """
 
         matched_list = []
+        preffix_list = [preffix] if isinstance(preffix, str) else preffix
 
-        for word, word_body in self.words.items():
+        for _, word_body in self.words.items():
             for template in word_body.templates:
-                if re.findall(f"{preffix}{template}", processed_message):
-                    matched_list.append(word_body)
+                if not preffix_list:
+                    for _preffix in preffix_list:
+                        self.__findall(
+                            f"{_preffix}{template}",
+                            word_body,
+                            processed_message,
+                            matched_list
+                        )
+                else:
+                    self.__findall(template, word_body, processed_message, matched_list)
 
         return matched_list
-
 
     def __str__(self):
         is_active_str = f'{ColorText.OKGREEN}включен{ColorText.ENDC}' if self.is_loaded else f'{ColorText.FAIL}выключен{ColorText.ENDC}'
@@ -107,4 +126,3 @@ class Phrases:
             List[Phrase]: list phrases
         """
         return self.phrases
-
