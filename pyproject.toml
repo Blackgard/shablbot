@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "shablbot"
-version = "1.0.3"
+version = "2.0.3"
 description = "SnablBot is an easily customizable bot capable of covering your tasks."
 authors = ["Alexander Dr. <sasna142@gmail.com>"]
 
