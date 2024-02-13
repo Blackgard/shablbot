@@ -41,7 +41,7 @@ setup(
         "idna==3.3",
         "six==1.16.0",
         "typing-extensions==3.10.0",
-        "urllib3==1.26.7",
+        "urllib3==1.26.18",
         "win32-setctime==1.0.3"
     ],
 )
