@@ -29,7 +29,7 @@ setup(
     python_requires='>=3.9',
     install_requires = [
         "vk-api==11.9.4",
-        "requests==2.26.0",
+        "requests==2.31.0",
         "pytz==2021.1",
         "loguru==0.5.3",
         "python-dotenv==0.19.0",
