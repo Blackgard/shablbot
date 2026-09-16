@@ -28,8 +28,15 @@ def build_ai_settings_from_env() -> AISettings:
             f"Допустимые значения: {', '.join(PROVIDER_PRESETS)}"
         )
 
+    mode = os.getenv("AI_MODE", "module").strip().lower()
+    if mode not in {"module", "standalone"}:
+        raise ValueError(
+            f"Неизвестный AI_MODE='{mode}'. Допустимые значения: module, standalone"
+        )
+
     return AISettings(
         enabled=os.getenv("AI_ENABLED", "false").strip().lower() == "true",
+        mode=mode,
         provider=provider,
         model=os.getenv("AI_MODEL", "openai/gpt-4o-mini"),
         api_key=os.getenv(preset["api_key_env"], ""),

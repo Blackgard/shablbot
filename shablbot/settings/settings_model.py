@@ -87,6 +87,7 @@ class AISettings(BaseModel):
     """Активный AI-провайдер и модель (настраиваются через .env)."""
 
     enabled: bool = False
+    mode: Literal["module", "standalone"] = "module"
     provider: Literal["openrouter", "polza"] = "openrouter"
     model: str = "openai/gpt-4o-mini"
     api_key: str = ""
@@ -104,6 +105,10 @@ class AISettings(BaseModel):
     @property
     def is_configured(self) -> bool:
         return self.enabled and bool(self.api_key.strip()) and bool(self.base_url.strip())
+
+    @property
+    def is_standalone(self) -> bool:
+        return self.is_configured and self.mode == "standalone"
 
 
 # SETTINGS MODELS

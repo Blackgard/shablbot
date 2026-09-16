@@ -11,6 +11,7 @@ from shablbot.components.module import Modules
 from shablbot.models.event_handler import ResponseHandler
 from shablbot.models.handler_context import HandlerContext
 
+from shablbot.components.handlers.ai import AIHandler
 from shablbot.components.handlers.modules import ModuleHandler
 from shablbot.components.handlers.message import MessageHandler
 from shablbot.components.handlers.command import CommandHandler
@@ -43,6 +44,12 @@ class EventHandler:
             self.settings, self.commands, self.chats, self.logger
         )
         self.message_handler = MessageHandler(self.settings, self.phrases, self.logger)
+        self.ai_handler = AIHandler(
+            self.settings,
+            self.commands,
+            self.message_handler,
+            self.logger,
+        )
 
     def _build_context(
         self, chat: Chat, event: VkBotMessageEventModel
@@ -56,6 +63,9 @@ class EventHandler:
 
         if self.command_handler.check_message(context):
             return self.command_handler.handling(context)
+
+        if chat.chat_settings.enabled and self.ai_handler.check_message(context):
+            return self.ai_handler.handling(context)
 
         if chat.chat_settings.enabled and self.module_handler.check_message(context):
             return self.module_handler.handling(context)

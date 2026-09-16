@@ -237,28 +237,37 @@ def activate_module(func) -> str:
 
 #### Нейросети (OpenRouter и Polza.ai)
 
-Бот поддерживает подключение нейросетей через [OpenRouter](https://openrouter.ai/) или [Polza.ai](https://polza.ai/). Провайдер и модель выбираются **только через `.env`**:
+Бот поддерживает [OpenRouter](https://openrouter.ai/) и [Polza.ai](https://polza.ai/). Провайдер и модель настраиваются через `.env`.
 
-1. Добавьте модуль `ai.neural_chat` в `ACTIVE_MODULES`
-2. Создайте `.env` в корне проекта бота:
+##### Режим `standalone` (рекомендуется)
 
-**OpenRouter:**
+Бот отвечает через нейросеть **без префиксов** `ии` / `ai` / `gpt`. Понимает обычные фразы: «привет», «выключи бота», «помоги».
+
 ```env
 AI_ENABLED=true
+AI_MODE=standalone
 AI_PROVIDER=openrouter
 AI_MODEL=openai/gpt-4o-mini
-OPENROUTER_API_KEY=your_openrouter_key
+OPENROUTER_API_KEY=your_key
 ```
 
-**Polza.ai:**
+В беседах бот реагирует, когда к нему обращаются (шаблоны из `DEFAULT_REACTION_TEMPLATES`). В личных сообщениях — на любое сообщение.
+
+Нейросеть сама распознаёт команды (`bot_off`, `bot_on`, `help`) и выполняет их.
+
+##### Режим `module` (с префиксом)
+
 ```env
 AI_ENABLED=true
+AI_MODE=module
 AI_PROVIDER=polza
 AI_MODEL=openai/gpt-4o
-POLZA_API_KEY=your_polza_key
+POLZA_API_KEY=your_key
 ```
 
-Дополнительные переменные (необязательно):
+Добавьте в `ACTIVE_MODULES`: `"ai.neural_chat"`. Команда в чате: `ии Привет!`
+
+##### Дополнительные переменные
 
 | Переменная | Описание | По умолчанию |
 |------------|----------|--------------|
@@ -267,8 +276,6 @@ POLZA_API_KEY=your_polza_key
 | `AI_TEMPERATURE` | Креативность | `0.7` |
 | `AI_HISTORY_LIMIT` | Сообщений в истории | `10` |
 | `AI_TIMEOUT` | Таймаут запроса (сек) | `60` |
-
-**Команда в чате:** `ии …` / `ai …` / `gpt …` — например: `ии Привет!`
 
 История диалога хранится в памяти бота (до `AI_HISTORY_LIMIT` сообщений на пользователя).
 
