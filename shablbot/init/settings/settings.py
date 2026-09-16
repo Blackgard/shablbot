@@ -133,7 +133,7 @@ LOGGER_CONFIG = {
             format="<green>{time:YYYY-MM-DD at HH:mm:ss}</green> | <level>{level}</level> | {message}"
         ),
         dict(
-            sink=open("main.log", mode="w", encoding="UTF-8"),
+            sink=BASE_DIR.parent.joinpath("main.log"),
             format="{time} | {level} | {name}:{function}:{line} | {message}"
         )
     ],

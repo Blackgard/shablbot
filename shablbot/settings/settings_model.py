@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple
 
 from enum import Enum
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 
 # TIME WORK MODELS
@@ -80,6 +80,18 @@ class SettingsModel(BaseModel):
     TOKEN: str
     ADMIN_ID: int
     BOT_CHAT_ID: int
+
+    @validator("ADMIN_ID", "BOT_CHAT_ID", pre=True)
+    def parse_required_int(cls, value):
+        if value in (None, ""):
+            raise ValueError("value is required")
+        return int(value)
+
+    @validator("CHAT_SETTINGS", pre=True)
+    def normalize_chat_settings_keys(cls, value):
+        if not value:
+            return value
+        return {str(chat_id): settings for chat_id, settings in value.items()}
     DEBUG_MODE: bool = False
     LOGGER_CONFIG: LoggerConfig
 

@@ -5,7 +5,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class ResponceHandler(BaseModel):
+class ResponseHandler(BaseModel):
     send_to_chat_id: str
 
     message: Optional[str]
@@ -16,3 +16,7 @@ class ResponceHandler(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
+
+
+# Обратная совместимость со старым именем.
+ResponceHandler = ResponseHandler

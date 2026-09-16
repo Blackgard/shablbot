@@ -92,7 +92,7 @@ class Modules:
         self.settings = settings
         self.logger = logger
 
-        self.folder = self.settings.KEYBOARDS_FOLDER
+        self.folder = self.settings.MODULES_FOLDER
         self.modules: Dict[str, Module] = {
             module_name: Module(module_name, self.settings.MODULES_FOLDER, self.logger)
             for module_name in self.settings.ACTIVE_MODULES

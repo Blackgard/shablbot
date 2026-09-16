@@ -2,7 +2,8 @@ from typing import Optional, Dict, Any
 
 import loguru
 
-from datetime import timezone, datetime as dt
+from datetime import datetime as dt, time
+from zoneinfo import ZoneInfo
 
 from vk_api.vk_api import VkApiMethod
 
@@ -47,9 +48,6 @@ class Chat:
 
         self.vk_chat_info = None
 
-    def __str__(self):
-        return (self.chat_id, self.chat_settings)
-
     def is_premitted_work(self) -> bool:
         action = {
             TimeWorkEnum.ALL: lambda time, settings: True,
@@ -62,37 +60,32 @@ class Chat:
         chat_time_work = self.chat_settings.time_work.type
         return action.get(chat_time_work)(chat_time_work, self.chat_settings)
 
+    @staticmethod
+    def _parse_clock(value: str) -> time:
+        hours, minutes = value.split(":")
+        return time(hour=int(hours), minute=int(minutes))
+
+    @staticmethod
+    def _is_time_in_range(current: time, time_from: time, time_to: time) -> bool:
+        if time_from <= time_to:
+            return time_from <= current <= time_to
+        return current >= time_from or current <= time_to
+
+    @staticmethod
     def check_chat_time_work(trigger_name: str, chat_settings: ChatSettingsBody) -> bool:
-        if trigger_name == "CUSTOM":  # CUSTOM
-            time_zone = dt.now(timezone(chat_settings.time_work))
-            time_from = chat_settings.time_from
-            time_to = chat_settings.time_to
+        time_work = chat_settings.time_work
+        current_time = dt.now(ZoneInfo(time_work.time_zone)).time()
 
-            if time_from <= time_zone.time() <= time_to:
-                return True
-            return False
+        if trigger_name == TimeWorkEnum.CUSTOM:
+            time_from = Chat._parse_clock(time_work.time_from)
+            time_to = Chat._parse_clock(time_work.time_to)
+            return Chat._is_time_in_range(current_time, time_from, time_to)
 
-        elif trigger_name == "NIGHT_MSK":  #
-            t_msk_NGT = [0, 8]
+        if trigger_name == TimeWorkEnum.NIGHT_MSK:
+            return Chat._is_time_in_range(current_time, time(0, 0), time(8, 0))
 
-            time_zone = dt.now(timezone(chat_settings.time_zone))
-            time_from = t_msk_NGT[0]
-            time_to = t_msk_NGT[1]
-
-            if time_from <= time_zone.time() <= time_to:
-                return True
-            return False
-
-        elif trigger_name == "DAY_MSK":  # DAY_MSK
-            t_msk_DAY = [9, 22]
-
-            time_zone = dt.now(timezone(chat_settings.time_zone))
-            time_from = t_msk_DAY[0]
-            time_to = t_msk_DAY[1]
-
-            if time_from <= time_zone.time() <= time_to:
-                return True
-            return False
+        if trigger_name == TimeWorkEnum.DAY_MSK:
+            return Chat._is_time_in_range(current_time, time(9, 0), time(22, 0))
 
         return False
 

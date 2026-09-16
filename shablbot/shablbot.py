@@ -19,7 +19,7 @@ from shablbot.components.keyboard import Keyboards
 from shablbot.components.event_handler import EventHandler
 from shablbot.components.phrases import Phrases
 
-from shablbot.models.event_handler import ResponceHandler
+from shablbot.models.event_handler import ResponseHandler
 from shablbot.models.shablbot import VkBotMessageEventModel
 
 from shablbot.settings.settings_model import SettingsModel
@@ -114,7 +114,8 @@ class ShablBot:
             is_processed (bool): Is processed event or not
         """
         event_object = self.__get_event_object(event)
-        if not event_object: return
+        if not event_object:
+            return False
 
         chat_work: Chat = self.chats.get_chat(
             event_object.message.peer_id,
@@ -123,14 +124,14 @@ class ShablBot:
         if not chat_work.is_premitted_work():
             return False
 
-        responceHandler = self.__handler_event.process_chat_event(
+        response_handler = self.__handler_event.process_chat_event(
             chat_work, event_object
         )
 
-        if not responceHandler.is_matches_found:
+        if not response_handler.is_matches_found:
             return False
 
-        return self.write_message_to_chat(responceHandler, chat_work)
+        return self.write_message_to_chat(response_handler, chat_work)
 
     def listen(self) -> None:
         """Start listen chat messages"""
@@ -141,36 +142,36 @@ class ShablBot:
         loguru.logger.info("------- Бот выключен / Bot is close -------")
 
     def write_message_to_chat(
-        self, responceHandler: ResponceHandler, chat: Chat
+        self, response_handler: ResponseHandler, chat: Chat
     ) -> bool:
         try:
             keyboard = self.keyboards.get_clear_keyboard().get_keyboard_json()
 
-            if responceHandler.keyboard_code:
+            if response_handler.keyboard_code:
                 keyboard = self.keyboards.get_keyboard(
-                    responceHandler.keyboard_code
+                    response_handler.keyboard_code
                 ).get_keyboard_json()
 
             if not self.settings.IS_SHOW_KEYBOARD_TO_CHAT and chat.is_chat:
                 keyboard = self.keyboards.get_clear_keyboard().get_keyboard_json()
 
             self.botAPI.messages.send(
-                peer_id=int(responceHandler.send_to_chat_id),
-                message=str(responceHandler.message),
+                peer_id=int(response_handler.send_to_chat_id),
+                message=str(response_handler.message),
                 random_id=random.getrandbits(31) * random.choice([-1, 1]),
                 keyboard=keyboard,
             )
 
             if self.debug:
                 self.logger.debug(
-                    f"Было отправлено сообщение: '{responceHandler.message}' (id беседы: {chat.chat_id})"
+                    f"Было отправлено сообщение: '{response_handler.message}' (id беседы: {chat.chat_id})"
                 )
 
             return True
         except Exception as e:
             self.logger.error(e)
             self.logger.error(
-                f"При отправке сообщения произошла ошибка. (ID{chat.chat_id}) | {responceHandler.message}"
+                f"При отправке сообщения произошла ошибка. (ID{chat.chat_id}) | {response_handler.message}"
             )
 
         return False
