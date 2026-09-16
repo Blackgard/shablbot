@@ -3,7 +3,7 @@ from types import ModuleType
 
 import loguru
 
-from pydantic.error_wrappers import ValidationError
+from pydantic import ValidationError
 
 from importlib.machinery import ModuleSpec
 from importlib.util import find_spec, module_from_spec

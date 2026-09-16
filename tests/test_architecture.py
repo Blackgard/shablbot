@@ -9,6 +9,7 @@ from shablbot.core.authorization import AuthorizationService
 from shablbot.core.message_matcher import MessageMatcher
 from shablbot.models.command import CommandSettingsMethods
 from shablbot.models.handler_context import HandlerContext
+from shablbot.models.user import User
 from shablbot.settings import SettingsModel
 from shablbot.settings.settings_model import ChatSettingsBody, ChatSettingsBodyTimeWork, TimeWorkEnum
 
@@ -37,15 +38,13 @@ class AuthorizationTests(unittest.TestCase):
     def test_private_commands_require_admin(self):
         admin_context = HandlerContext(
             chat=MagicMock(chat_id="1"),
+            user=User(user_id=100, admin_id=100, peer_id=1),
             message_text="test",
-            from_id=100,
-            admin_id=100,
         )
         user_context = HandlerContext(
             chat=MagicMock(chat_id="1"),
+            user=User(user_id=200, admin_id=100, peer_id=1),
             message_text="test",
-            from_id=200,
-            admin_id=100,
         )
 
         self.assertTrue(AuthorizationService.can_execute_private_command(admin_context))
@@ -109,9 +108,8 @@ class CommandHandlerTests(unittest.TestCase):
 
         context = HandlerContext(
             chat=MagicMock(chat_id="2"),
+            user=User(user_id=999, admin_id=1, peer_id=2),
             message_text="secret",
-            from_id=999,
-            admin_id=1,
         )
 
         self.assertFalse(handler.check_message(context))

@@ -3,7 +3,7 @@ from typing import List, Union
 
 from enum import Enum
 
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, ConfigDict, field_validator
 
 
 class CommandSettingsNeed(str, Enum):
@@ -18,7 +18,9 @@ class CommandSettingsMethods(str, Enum):
 
 
 class CommandSettings(BaseModel):
-    code: constr(to_lower=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    code: str
     name: str
 
     answer: str
@@ -30,5 +32,7 @@ class CommandSettings(BaseModel):
 
     entry_point: Union[FunctionType, MethodType]
 
-    class Config:
-        arbitrary_types_allowed = True
+    @field_validator("code", mode="before")
+    @classmethod
+    def normalize_code(cls, value: str) -> str:
+        return value.lower() if isinstance(value, str) else value

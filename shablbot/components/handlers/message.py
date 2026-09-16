@@ -81,8 +81,8 @@ class MessageHandler(BaseMessageHandler):
     def get_message_to_reply(
         self, probability: PhraseBodyWordAnswerWithProbability
     ) -> str:
-        default_probabilities = self.settings.DEFAULT_PROBABILITY.dict()
-        dict_probabilities = probability.dict(exclude_none=True)
+        default_probabilities = self.settings.DEFAULT_PROBABILITY.model_dump()
+        dict_probabilities = probability.model_dump(exclude_none=True)
         weights_probabilities = [
             prob
             for name, prob in default_probabilities.items()
@@ -93,7 +93,7 @@ class MessageHandler(BaseMessageHandler):
             [*dict_probabilities.keys()], weights=weights_probabilities
         )[0]
 
-        return random.choice(probability.dict()[probability_type])
+        return random.choice(probability.model_dump()[probability_type])
 
     def check_message(self, context: HandlerContext) -> bool:
         return bool(self.find_matches_to_message(context).phrases)

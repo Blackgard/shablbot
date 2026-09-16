@@ -93,6 +93,12 @@ TYPE_TIME_WORK = {
     "DAY_MSK": "Europe/Moscow",
 }
 
+# Файл для сохранения настроек чатов между перезапусками бота
+CHAT_SETTINGS_FILE = BASE_DIR.joinpath("data", "chat_settings.json")
+
+# Включить автосохранение настроек чатов в файл
+CHAT_SETTINGS_PERSIST = True
+
 # Настройки времени работы конкретного чата
 CHAT_SETTINGS = {
     123456789: {
@@ -155,6 +161,8 @@ SETTINGS = SettingsModel(
     DEFAULT_PROBABILITY=DEFAULT_PROBABILITY,
 
     CHAT_SETTINGS=CHAT_SETTINGS,
+    CHAT_SETTINGS_FILE=CHAT_SETTINGS_FILE,
+    CHAT_SETTINGS_PERSIST=CHAT_SETTINGS_PERSIST,
 
     PHRASES_FOLDER=PHRASES_FOLDER,
     EXCLUDED_PHRASES=EXCLUDED_PHRASES,

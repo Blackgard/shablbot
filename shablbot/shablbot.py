@@ -40,7 +40,9 @@ class ShablBot:
         self.logger: loguru.Logger = loguru.logger
 
         if self.settings.LOGGER_CONFIG:
-            self.logger.configure(**self.settings.LOGGER_CONFIG.dict(exclude_none=True))
+            self.logger.configure(
+                **self.settings.LOGGER_CONFIG.model_dump(exclude_none=True)
+            )
 
         self._bot_session: vk_api.VkApi = vk_api.VkApi(token=settings.TOKEN)
         self.botAPI: VkApiMethod = self._bot_session.get_api()
@@ -99,7 +101,7 @@ class ShablBot:
         """
         allowed_events = {
             VkBotEventType.MESSAGE_REPLY: lambda _: False,
-            VkBotEventType.MESSAGE_NEW: VkBotMessageEventModel.parse_obj,
+            VkBotEventType.MESSAGE_NEW: VkBotMessageEventModel.model_validate,
             # ... and more event type
         }
         return allowed_events.get(event.type, lambda _: False)(event.object)
