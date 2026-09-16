@@ -1,0 +1,14 @@
+{
+    "group": "приветствие",
+    "words": {
+        "привет": {
+            "templates": ["привет", "здравствуй", "hello", "hi"],
+            "answer": {
+                "common": ["Ходор!", "Hodor!", "Хо-дор!"],
+                "uncommon": ["Ходор... *улыбается*"],
+                "rare": ["Hodor hodooor!"]
+            },
+            "keyboard": "clear"
+        }
+    }
+}

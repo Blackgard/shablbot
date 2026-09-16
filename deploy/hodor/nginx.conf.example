@@ -1,0 +1,14 @@
+# Пример для nginx на сервере portfolio (порт 3010)
+# /etc/nginx/sites-available/hodor-bot
+
+server {
+    listen 3010;
+    server_name _;
+
+    location / {
+        proxy_pass http://127.0.0.1:3010;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}

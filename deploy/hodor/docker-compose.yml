@@ -1,0 +1,14 @@
+services:
+  hodor-bot:
+    build:
+      context: ../..
+      dockerfile: deploy/hodor/Dockerfile
+    container_name: shablbot-hodor
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "3010:3010"
+    volumes:
+      - ./data:/app/deploy/hodor/bot/data
+      - ./logs:/app/deploy/hodor/bot/logs

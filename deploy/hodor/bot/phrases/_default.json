@@ -1,0 +1,15 @@
+{
+    "group": "default",
+    "words": {
+        "main": {
+            "templates": ["ходор", "hodor", "бот"],
+            "answer": {
+                "common": ["Ходор", "Hodor", "Ходор!"],
+                "uncommon": ["Хо-дор", "Ходор ходор"],
+                "rare": ["Ходор... *кивает*"],
+                "legendary": ["HODOR!"]
+            },
+            "keyboard": "default"
+        }
+    }
+}

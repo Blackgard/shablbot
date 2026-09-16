@@ -346,6 +346,8 @@ python -m unittest discover -s tests -p "test_*.py" -v
 
 Бот по имени "Ходор" - [клик-клик (вк)](https://vk.com/hodor_designer)
 
+Готовый деплой бота Ходор для сервера: [deploy/hodor/README.md](deploy/hodor/README.md)
+
 ## 🧰 CLI Shablbot
 
 Для бота разработано CLI. Доступные методы:
