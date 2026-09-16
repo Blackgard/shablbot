@@ -52,26 +52,28 @@ class Phrase:
         if re.findall(message, processed_message):
             matched_list.append(word_body)
 
-    def find_match_with_message(self, processed_message: str, preffix: Union[str, List[str]] = "") -> List[PhraseBodyWord]:
+    def find_match_with_message(
+        self, processed_message: str, prefix: Union[str, List[str]] = ""
+    ) -> List[PhraseBodyWord]:
         """Find a match with a message.
 
         Args:
             processed_message (str): string fo find template.
-            preffix (str, List[str], optional): Prefixx to phrase. Defaults to "".
+            prefix (str, List[str], optional): Prefix to phrase. Defaults to "".
 
         Returns:
             List[PhraseBodyWord]: List mached phrases.
         """
 
         matched_list = []
-        preffix_list = [preffix] if isinstance(preffix, str) else preffix
+        prefix_list = [prefix] if isinstance(prefix, str) else prefix
 
         for _, word_body in self.words.items():
             for template in word_body.templates:
-                if preffix_list:
-                    for _preffix in preffix_list:
+                if prefix_list:
+                    for item_prefix in prefix_list:
                         self.__findall(
-                            f"{_preffix}{template}",
+                            f"{item_prefix}{template}",
                             word_body,
                             processed_message,
                             matched_list,
