@@ -1,6 +1,28 @@
-from typing import Any, List, Dict
+from pathlib import Path
+from typing import Any, Dict, List
 
 from anytree import Node, RenderTree, ContRoundStyle
+
+
+def normalize_logger_config(logger_config: Dict[str, Any]) -> Dict[str, Any]:
+    """Привести LOGGER_CONFIG к формату, совместимому с loguru."""
+    config = dict(logger_config)
+    handlers = []
+
+    for handler in config.get("handlers") or []:
+        normalized = dict(handler)
+        sink = normalized.get("sink")
+
+        if isinstance(sink, Path):
+            normalized["sink"] = str(sink)
+            Path(normalized["sink"]).parent.mkdir(parents=True, exist_ok=True)
+        elif isinstance(sink, str) and sink not in {"stderr", "stdout"}:
+            Path(sink).parent.mkdir(parents=True, exist_ok=True)
+
+        handlers.append(normalized)
+
+    config["handlers"] = handlers
+    return config
 
 
 class RenderState:

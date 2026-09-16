@@ -44,6 +44,9 @@ def start_bot() -> None:
     from settings.settings import SETTINGS
     from shablbot import ShablBot
 
+    (BOT_DIR / "logs").mkdir(parents=True, exist_ok=True)
+    (BOT_DIR / "data").mkdir(parents=True, exist_ok=True)
+
     bot = ShablBot(SETTINGS)
     bot.listen()
 

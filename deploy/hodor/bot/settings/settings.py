@@ -79,7 +79,7 @@ LOGGER_CONFIG = {
             format="<green>{time:YYYY-MM-DD at HH:mm:ss}</green> | <level>{level}</level> | {message}",
         ),
         dict(
-            sink=BASE_DIR.joinpath("logs", "hodor.log"),
+            sink=str(BASE_DIR.joinpath("logs", "hodor.log")),
             format="{time} | {level} | {name}:{function}:{line} | {message}",
         ),
     ],

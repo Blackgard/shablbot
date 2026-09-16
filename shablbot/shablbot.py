@@ -24,7 +24,7 @@ from shablbot.models.shablbot import VkBotMessageEventModel
 
 from shablbot.settings.settings_model import SettingsModel
 
-from shablbot.core.utils import render_state_all_components
+from shablbot.core.utils import normalize_logger_config, render_state_all_components
 from shablbot.core.exceptions import VkBotLonngpollNotExists
 
 
@@ -40,9 +40,10 @@ class ShablBot:
         self.logger: loguru.Logger = loguru.logger
 
         if self.settings.LOGGER_CONFIG:
-            self.logger.configure(
-                **self.settings.LOGGER_CONFIG.model_dump(exclude_none=True)
+            logger_config = normalize_logger_config(
+                self.settings.LOGGER_CONFIG.model_dump(exclude_none=True)
             )
+            self.logger.configure(**logger_config)
 
         self._bot_session: vk_api.VkApi = vk_api.VkApi(token=settings.TOKEN)
         self.botAPI: VkApiMethod = self._bot_session.get_api()
