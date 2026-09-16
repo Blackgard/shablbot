@@ -144,7 +144,7 @@ DEFAULT_PROBABILITY = {
 LOGGER_CONFIG = {
     "handlers": [
         dict(
-            sink=sys.stderr,
+            sink="stderr",
             colorize=True,
             format="<green>{time:YYYY-MM-DD at HH:mm:ss}</green> | <level>{level}</level> | {message}"
         ),

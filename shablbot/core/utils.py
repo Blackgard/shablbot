@@ -1,7 +1,13 @@
+import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
 from anytree import Node, RenderTree, ContRoundStyle
+
+_STD_STREAMS = {
+    "stderr": sys.stderr,
+    "stdout": sys.stdout,
+}
 
 
 def normalize_logger_config(logger_config: Dict[str, Any]) -> Dict[str, Any]:
@@ -13,11 +19,15 @@ def normalize_logger_config(logger_config: Dict[str, Any]) -> Dict[str, Any]:
         normalized = dict(handler)
         sink = normalized.get("sink")
 
-        if isinstance(sink, Path):
+        if sink in _STD_STREAMS:
+            normalized["sink"] = _STD_STREAMS[sink]
+        elif isinstance(sink, Path):
             normalized["sink"] = str(sink)
-            Path(normalized["sink"]).parent.mkdir(parents=True, exist_ok=True)
-        elif isinstance(sink, str) and sink not in {"stderr", "stdout"}:
+        elif isinstance(sink, str):
             Path(sink).parent.mkdir(parents=True, exist_ok=True)
+        elif type(sink).__name__ == "SerializationIterator":
+            # Pydantic v2 ломает sys.stderr при model_dump — восстанавливаем по index
+            normalized["sink"] = sys.stderr if getattr(sink, "index", 0) == 0 else sys.stdout
 
         handlers.append(normalized)
 
