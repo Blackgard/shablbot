@@ -1,5 +1,6 @@
 from shablbot.models.user import User
 from shablbot.settings.settings_model import (
+    AISettings,
     ChatSettingsBody,
     ChatSettingsBodyTimeWork,
     Commands,
@@ -13,6 +14,7 @@ from shablbot.settings.settings_model import (
 
 __all__ = [
     "User",
+    "AISettings",
     "ChatSettingsBody",
     "ChatSettingsBodyTimeWork",
     "Commands",

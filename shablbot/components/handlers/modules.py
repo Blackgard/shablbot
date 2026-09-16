@@ -26,8 +26,14 @@ class ModuleHandler(BaseMessageHandler):
     def check_message(self, context: HandlerContext) -> bool:
         return self.find_matches_to_message(context.processed_message) is not None
 
-    def activate_func(self, module: Module, func_name: str) -> Optional[str]:
-        return module.module_settings.entry_point(func_name)
+    def activate_func(
+        self, module: Module, func_name: str, context: HandlerContext
+    ) -> Optional[str]:
+        entry_point = module.module_settings.entry_point
+        try:
+            return entry_point(func_name, context=context)
+        except TypeError:
+            return entry_point(func_name)
 
     def find_matches_to_message(
         self, message: str
@@ -56,6 +62,6 @@ class ModuleHandler(BaseMessageHandler):
         func_name, module = match
         return ResponseHandler(
             send_to_chat_id=context.reply_chat_id,
-            message=self.activate_func(module, func_name),
+            message=self.activate_func(module, func_name, context),
             is_matches_found=True,
         )

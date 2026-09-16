@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 from dotenv import load_dotenv
 from shablbot.settings import SettingsModel
+from shablbot.core.ai import build_ai_settings_from_env
 
 load_dotenv()
 
@@ -55,6 +56,7 @@ MODULES_FOLDER = "modules"
 # Модули дополнения функциональной возможности бота.
 # Имеется возможность разрабатывать индивидуальные модули , выполненные в определенном формате.
 # (Смотрите пример модуля "flip_and_roll.py")
+# Для AI_MODE=module добавьте "ai.neural_chat"
 ACTIVE_MODULES = ["games.flip_and_roll"]
 
 # Папка для клавиатур бота
@@ -121,6 +123,14 @@ CHAT_SETTINGS = {
     },
 }
 
+# Настройки нейросетей через .env:
+#   AI_ENABLED=true
+#   AI_MODE=standalone          # standalone — без префиксов ии/ai/gpt; module — через ai.neural_chat
+#   AI_PROVIDER=openrouter|polza
+#   AI_MODEL=openai/gpt-4o-mini
+#   OPENROUTER_API_KEY / POLZA_API_KEY
+AI_SETTINGS = build_ai_settings_from_env()
+
 # Шанс выпадения ответа бота для каждого из типов редкости
 DEFAULT_PROBABILITY = {
     "common": 0.5,
@@ -176,5 +186,7 @@ SETTINGS = SettingsModel(
     KEYBOARDS_FOLDER=KEYBOARDS_FOLDER,
     KEYBOARDS=KEYBOARDS,
     IS_SHOW_KEYBOARD_TO_CHAT=IS_SHOW_KEYBOARD_TO_CHAT,
+
+    AI_SETTINGS=AI_SETTINGS,
 
 )

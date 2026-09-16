@@ -58,8 +58,10 @@ linux
  ┃  ┣ 📜 clear.json
  ┃  ┗ 📜 default.json
  ┣ 📂modules
- ┃ ┗ 📂games
- ┃    ┗ 🐍 flip_and_roll.py
+ ┃  ┣ 📂ai
+ ┃  ┃  ┗ 🐍 neural_chat.py
+ ┃  ┗ 📂games
+ ┃     ┗ 🐍 flip_and_roll.py
  ┣ 📂phrases
  ┃  ┣ 📜 _default.json
  ┃  ┣ 📜 bye.json
@@ -232,6 +234,50 @@ def activate_module(func) -> str:
 ```
 
 [Подробнее о структуре кастомных модулей смотрите тут flip_and_roll.py](/shablbot/init/modules/games/flip_and_roll.py)
+
+#### Нейросети (OpenRouter и Polza.ai)
+
+Бот поддерживает [OpenRouter](https://openrouter.ai/) и [Polza.ai](https://polza.ai/). Провайдер и модель настраиваются через `.env`.
+
+##### Режим `standalone` (рекомендуется)
+
+Бот отвечает через нейросеть **без префиксов** `ии` / `ai` / `gpt`. Понимает обычные фразы: «привет», «выключи бота», «помоги».
+
+```env
+AI_ENABLED=true
+AI_MODE=standalone
+AI_PROVIDER=openrouter
+AI_MODEL=openai/gpt-4o-mini
+OPENROUTER_API_KEY=your_key
+```
+
+В беседах бот реагирует, когда к нему обращаются (шаблоны из `DEFAULT_REACTION_TEMPLATES`). В личных сообщениях — на любое сообщение.
+
+Нейросеть сама распознаёт команды (`bot_off`, `bot_on`, `help`) и выполняет их.
+
+##### Режим `module` (с префиксом)
+
+```env
+AI_ENABLED=true
+AI_MODE=module
+AI_PROVIDER=polza
+AI_MODEL=openai/gpt-4o
+POLZA_API_KEY=your_key
+```
+
+Добавьте в `ACTIVE_MODULES`: `"ai.neural_chat"`. Команда в чате: `ии Привет!`
+
+##### Дополнительные переменные
+
+| Переменная | Описание | По умолчанию |
+|------------|----------|--------------|
+| `AI_SYSTEM_PROMPT` | Системный промпт | краткий ассистент VK-бота |
+| `AI_MAX_TOKENS` | Лимит токенов ответа | `1024` |
+| `AI_TEMPERATURE` | Креативность | `0.7` |
+| `AI_HISTORY_LIMIT` | Сообщений в истории | `10` |
+| `AI_TIMEOUT` | Таймаут запроса (сек) | `60` |
+
+История диалога хранится в памяти бота (до `AI_HISTORY_LIMIT` сообщений на пользователя).
 
 ### phrases <a name="bot_modules_phrases"></a>
 Модуль отвечающий за фразы, на которые бот реагирует. Содержит в себе файлы <b>.json</b> формата.

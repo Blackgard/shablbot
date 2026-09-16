@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from pathlib import Path
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Optional, Any, Tuple, Literal
 
 from enum import Enum
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 # TIME WORK MODELS
@@ -80,6 +80,37 @@ class LoggerConfig(BaseModel):
     activation: Optional[List[Tuple[str, bool]]] = None
 
 
+# AI MODELS
+
+
+class AISettings(BaseModel):
+    """Активный AI-провайдер и модель (настраиваются через .env)."""
+
+    enabled: bool = False
+    mode: Literal["module", "standalone"] = "module"
+    provider: Literal["openrouter", "polza"] = "openrouter"
+    model: str = "openai/gpt-4o-mini"
+    api_key: str = ""
+    base_url: str
+    system_prompt: str = (
+        "Ты дружелюбный ассистент VK-бота. Отвечай кратко, понятно и по-русски."
+    )
+    max_tokens: int = 1024
+    temperature: float = 0.7
+    history_limit: int = 10
+    timeout: float = 60.0
+    http_referer: Optional[str] = None
+    site_title: Optional[str] = "ShablBot"
+
+    @property
+    def is_configured(self) -> bool:
+        return self.enabled and bool(self.api_key.strip()) and bool(self.base_url.strip())
+
+    @property
+    def is_standalone(self) -> bool:
+        return self.is_configured and self.mode == "standalone"
+
+
 # SETTINGS MODELS
 
 
@@ -116,6 +147,14 @@ class SettingsModel(BaseModel):
 
     CHAT_SETTINGS_FILE: Optional[Path] = None
     CHAT_SETTINGS_PERSIST: bool = True
+
+    AI_SETTINGS: AISettings = Field(
+        default_factory=lambda: AISettings(
+            enabled=False,
+            api_key="",
+            base_url="https://openrouter.ai/api/v1",
+        )
+    )
 
     @field_validator("ADMIN_ID", "BOT_CHAT_ID", mode="before")
     @classmethod
