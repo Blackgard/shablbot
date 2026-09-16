@@ -5,6 +5,7 @@ from unittest.mock import MagicMock
 
 from shablbot.components.chat import Chat
 from shablbot.core.chat_storage import ChatSettingsStorage
+from shablbot.models.chat import VkInfo
 from shablbot.settings.settings_model import (
     ChatSettingsBody,
     ChatSettingsBodyTimeWork,
@@ -64,6 +65,22 @@ class ChatPersistenceCallbackTests(unittest.TestCase):
 
         callback.assert_called_once_with(chat)
         self.assertFalse(chat.chat_settings.enabled)
+
+
+class VkInfoModelTests(unittest.TestCase):
+    def test_private_conversation_without_chat_settings(self):
+        payload = {
+            "peer": {"id": 153950322, "type": "user", "local_id": 153950322},
+            "last_message_id": 1,
+            "in_read": 1,
+            "out_read": 0,
+            "last_conversation_message_id": 1,
+            "is_marked_unread": False,
+            "important": False,
+            "can_write": {"allowed": True},
+        }
+        info = VkInfo.model_validate(payload)
+        self.assertIsNone(info.chat_settings)
 
 
 if __name__ == "__main__":

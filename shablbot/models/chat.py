@@ -50,4 +50,4 @@ class VkInfo(BaseModel):
     is_marked_unread: bool
     important: bool
     can_write: VkInfoCanWrite
-    chat_settings: Optional[VkInfoChatSettings]
+    chat_settings: Optional[VkInfoChatSettings] = None
