@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 from dotenv import load_dotenv
 from shablbot.settings import SettingsModel
+from shablbot.core.ai import build_ai_settings_from_env
 
 load_dotenv()
 
@@ -121,33 +122,9 @@ CHAT_SETTINGS = {
     },
 }
 
-# Настройки нейросетей (OpenRouter и Polza.ai)
-AI_SETTINGS = {
-    "enabled": os.getenv("AI_ENABLED", "false").lower() == "true",
-    "default_provider": os.getenv("AI_DEFAULT_PROVIDER", "openrouter"),
-    "history_limit": 10,
-    "timeout": 60.0,
-    "openrouter": {
-        "enabled": os.getenv("OPENROUTER_ENABLED", "true").lower() == "true",
-        "api_key": os.getenv("OPENROUTER_API_KEY", ""),
-        "base_url": "https://openrouter.ai/api/v1",
-        "default_model": os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
-        "system_prompt": "Ты дружелюбный ассистент VK-бота. Отвечай кратко и по-русски.",
-        "max_tokens": 1024,
-        "temperature": 0.7,
-        "http_referer": os.getenv("OPENROUTER_HTTP_REFERER"),
-        "site_title": os.getenv("OPENROUTER_SITE_TITLE", "ShablBot"),
-    },
-    "polza": {
-        "enabled": os.getenv("POLZA_ENABLED", "true").lower() == "true",
-        "api_key": os.getenv("POLZA_API_KEY", ""),
-        "base_url": "https://polza.ai/api/v1",
-        "default_model": os.getenv("POLZA_MODEL", "openai/gpt-4o-mini"),
-        "system_prompt": "Ты дружелюбный ассистент VK-бота. Отвечай кратко и по-русски.",
-        "max_tokens": 1024,
-        "temperature": 0.7,
-    },
-}
+# Настройки нейросетей — провайдер и модель выбираются через .env:
+#   AI_ENABLED, AI_PROVIDER (openrouter|polza), AI_MODEL, OPENROUTER_API_KEY / POLZA_API_KEY
+AI_SETTINGS = build_ai_settings_from_env()
 
 # Шанс выпадения ответа бота для каждого из типов редкости
 DEFAULT_PROBABILITY = {

@@ -1,16 +1,10 @@
 from __future__ import annotations
 
-from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import requests
 
-from shablbot.settings.settings_model import AIProviderConfig
-
-
-class AIProviderName(str, Enum):
-    OPENROUTER = "openrouter"
-    POLZA = "polza"
+from shablbot.settings.settings_model import AISettings
 
 
 class AIProviderError(Exception):
@@ -20,60 +14,45 @@ class AIProviderError(Exception):
 class OpenAICompatibleProvider:
     """Клиент для OpenAI-совместимых API (OpenRouter, Polza.ai)."""
 
-    def __init__(
-        self,
-        name: AIProviderName,
-        config: AIProviderConfig,
-        timeout: float,
-    ) -> None:
-        self.name = name
-        self.config = config
-        self.timeout = timeout
+    def __init__(self, settings: AISettings) -> None:
+        self.settings = settings
 
-    @property
-    def is_configured(self) -> bool:
-        return self.config.enabled and bool(self.config.api_key.strip())
-
-    def complete(
-        self,
-        messages: List[Dict[str, str]],
-        model: Optional[str] = None,
-    ) -> str:
-        if not self.is_configured:
+    def complete(self, messages: List[Dict[str, str]]) -> str:
+        if not self.settings.is_configured:
             raise AIProviderError(
-                f"Провайдер {self.name.value} не настроен. Укажите API-ключ и enabled=true."
+                "AI не настроен. Проверьте AI_ENABLED, AI_PROVIDER, API-ключ и AI_MODEL в .env."
             )
 
         payload = {
-            "model": model or self.config.default_model,
+            "model": self.settings.model,
             "messages": messages,
-            "temperature": self.config.temperature,
-            "max_tokens": self.config.max_tokens,
+            "temperature": self.settings.temperature,
+            "max_tokens": self.settings.max_tokens,
         }
 
         headers = {
-            "Authorization": f"Bearer {self.config.api_key}",
+            "Authorization": f"Bearer {self.settings.api_key}",
             "Content-Type": "application/json",
         }
 
-        if self.name == AIProviderName.OPENROUTER:
-            if self.config.http_referer:
-                headers["HTTP-Referer"] = self.config.http_referer
-            if self.config.site_title:
-                headers["X-OpenRouter-Title"] = self.config.site_title
+        if self.settings.provider == "openrouter":
+            if self.settings.http_referer:
+                headers["HTTP-Referer"] = self.settings.http_referer
+            if self.settings.site_title:
+                headers["X-OpenRouter-Title"] = self.settings.site_title
 
-        url = f"{self.config.base_url.rstrip('/')}/chat/completions"
+        url = f"{self.settings.base_url.rstrip('/')}/chat/completions"
 
         try:
             response = requests.post(
                 url,
                 headers=headers,
                 json=payload,
-                timeout=self.timeout,
+                timeout=self.settings.timeout,
             )
         except requests.RequestException as error:
             raise AIProviderError(
-                f"Не удалось связаться с {self.name.value}: {error}"
+                f"Не удалось связаться с {self.settings.provider}: {error}"
             ) from error
 
         if response.status_code >= 400:
@@ -81,8 +60,7 @@ class OpenAICompatibleProvider:
                 self._format_api_error(response.status_code, response.text)
             )
 
-        data = response.json()
-        return self._extract_content(data)
+        return self._extract_content(response.json())
 
     @staticmethod
     def _extract_content(data: Dict[str, Any]) -> str:

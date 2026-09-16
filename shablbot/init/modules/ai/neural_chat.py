@@ -30,29 +30,13 @@ def activate_module(func_name: str, context: HandlerContext = None) -> str:
     if context is None:
         return "Модуль нейросетей требует контекст сообщения."
 
-    patterns = settings["templates"].get(func_name, [])
-    prompt = _extract_prompt(context, patterns)
+    prompt = _extract_prompt(context, settings["templates"].get(func_name, []))
 
     if not prompt:
-        return (
-            "Напишите вопрос после команды.\n"
-            "Примеры:\n"
-            "• ии Привет!\n"
-            "• openrouter Объясни квантовую физику\n"
-            "• polza Напиши стих про кота"
-        )
+        return "Напишите вопрос после команды. Пример: ии Привет!"
 
     try:
-        service = _get_service()
-
-        if func_name == "openrouter":
-            return service.ask("openrouter", context.from_id, prompt)
-        if func_name == "polza":
-            return service.ask("polza", context.from_id, prompt)
-        if func_name == "ask":
-            return service.ask_default(context.from_id, prompt)
-
-        return "Неизвестная команда нейросети."
+        return _get_service().ask(context.from_id, prompt)
     except AIProviderError as error:
         return f"Ошибка AI: {error}"
     except Exception as error:
@@ -61,30 +45,18 @@ def activate_module(func_name: str, context: HandlerContext = None) -> str:
 
 settings = {
     "name": "Neural chat",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "author": "ShablBot",
     "date_created": "16.09.2026",
     "entry_point": activate_module,
     "func": {
         "ask": {
             "name": "ask",
-            "description": "Запрос к провайдеру по умолчанию",
-            "entry_point": activate_module,
-        },
-        "openrouter": {
-            "name": "openrouter",
-            "description": "Запрос через OpenRouter",
-            "entry_point": activate_module,
-        },
-        "polza": {
-            "name": "polza",
-            "description": "Запрос через Polza.ai",
+            "description": "Запрос к нейросети",
             "entry_point": activate_module,
         },
     },
     "templates": {
         "ask": [r"(?i)^(?:ии|ai|gpt)\s+(.+)$"],
-        "openrouter": [r"(?i)^(?:openrouter|ор)\s+(.+)$"],
-        "polza": [r"(?i)^(?:polza|польза)\s+(.+)$"],
     },
 }

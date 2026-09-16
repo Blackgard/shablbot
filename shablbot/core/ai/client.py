@@ -1,83 +1,36 @@
 from __future__ import annotations
 
 from collections import defaultdict, deque
-from typing import Deque, Dict, List, Literal
+from typing import Deque, Dict, List
 
-from shablbot.core.ai.providers import (
-    AIProviderError,
-    AIProviderName,
-    OpenAICompatibleProvider,
-)
-from shablbot.settings.settings_model import AISettings, AIProviderConfig
-
-
-ProviderName = Literal["openrouter", "polza"]
+from shablbot.core.ai.providers import AIProviderError, OpenAICompatibleProvider
+from shablbot.settings.settings_model import AISettings
 
 
 class AIChatService:
-    """Сервис диалога с нейросетями через OpenRouter и Polza.ai."""
+    """Сервис диалога с нейросетью через выбранный в .env провайдер."""
 
     def __init__(self, settings: AISettings) -> None:
         self.settings = settings
+        self._provider = OpenAICompatibleProvider(settings)
         self._history: Dict[str, Deque[Dict[str, str]]] = defaultdict(deque)
-        self._providers = {
-            AIProviderName.OPENROUTER: OpenAICompatibleProvider(
-                AIProviderName.OPENROUTER,
-                settings.openrouter,
-                settings.timeout,
-            ),
-            AIProviderName.POLZA: OpenAICompatibleProvider(
-                AIProviderName.POLZA,
-                settings.polza,
-                settings.timeout,
-            ),
-        }
 
     def is_enabled(self) -> bool:
-        return self.settings.enabled and any(
-            provider.is_configured for provider in self._providers.values()
-        )
+        return self.settings.is_configured
 
-    def ask(
-        self,
-        provider_name: ProviderName,
-        user_id: int,
-        prompt: str,
-        model: str | None = None,
-    ) -> str:
+    def ask(self, user_id: int, prompt: str) -> str:
         if not self.settings.enabled:
-            raise AIProviderError("AI-модуль отключён в настройках (AI_SETTINGS.enabled=false).")
+            raise AIProviderError("AI отключён. Установите AI_ENABLED=true в .env.")
 
-        provider = self._get_provider(provider_name)
-        history_key = self._history_key(user_id, provider_name)
-        messages = self._build_messages(provider.config, history_key, prompt)
-        answer = provider.complete(messages, model=model)
+        history_key = str(user_id)
+        messages = self._build_messages(history_key, prompt)
+        answer = self._provider.complete(messages)
         self._remember_exchange(history_key, prompt, answer)
         return self._truncate_for_vk(answer)
 
-    def ask_default(self, user_id: int, prompt: str, model: str | None = None) -> str:
-        return self.ask(self.settings.default_provider, user_id, prompt, model=model)
-
-    def _get_provider(self, provider_name: ProviderName) -> OpenAICompatibleProvider:
-        try:
-            provider_key = AIProviderName(provider_name)
-        except ValueError as error:
-            raise AIProviderError(f"Неизвестный провайдер: {provider_name}") from error
-
-        return self._providers[provider_key]
-
-    @staticmethod
-    def _history_key(user_id: int, provider_name: str) -> str:
-        return f"{user_id}:{provider_name}"
-
-    def _build_messages(
-        self,
-        provider_config: AIProviderConfig,
-        history_key: str,
-        prompt: str,
-    ) -> List[Dict[str, str]]:
+    def _build_messages(self, history_key: str, prompt: str) -> List[Dict[str, str]]:
         messages: List[Dict[str, str]] = [
-            {"role": "system", "content": provider_config.system_prompt}
+            {"role": "system", "content": self.settings.system_prompt}
         ]
         messages.extend(self._history[history_key])
         messages.append({"role": "user", "content": prompt})

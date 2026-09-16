@@ -237,29 +237,40 @@ def activate_module(func) -> str:
 
 #### Нейросети (OpenRouter и Polza.ai)
 
-Бот поддерживает подключение нейросетей через [OpenRouter](https://openrouter.ai/) и [Polza.ai](https://polza.ai/) — оба сервиса используют OpenAI-совместимый Chat Completions API.
+Бот поддерживает подключение нейросетей через [OpenRouter](https://openrouter.ai/) или [Polza.ai](https://polza.ai/). Провайдер и модель выбираются **только через `.env`**:
 
 1. Добавьте модуль `ai.neural_chat` в `ACTIVE_MODULES`
-2. Настройте `AI_SETTINGS` в `settings.py` (или через `.env`):
+2. Создайте `.env` в корне проекта бота:
 
+**OpenRouter:**
 ```env
 AI_ENABLED=true
+AI_PROVIDER=openrouter
+AI_MODEL=openai/gpt-4o-mini
 OPENROUTER_API_KEY=your_openrouter_key
-POLZA_API_KEY=your_polza_key
-AI_DEFAULT_PROVIDER=openrouter
-OPENROUTER_MODEL=openai/gpt-4o-mini
-POLZA_MODEL=openai/gpt-4o-mini
 ```
 
-**Команды в чате:**
+**Polza.ai:**
+```env
+AI_ENABLED=true
+AI_PROVIDER=polza
+AI_MODEL=openai/gpt-4o
+POLZA_API_KEY=your_polza_key
+```
 
-| Команда | Пример | Провайдер |
-|---------|--------|-----------|
-| `ии …` / `ai …` / `gpt …` | `ии Привет!` | провайдер по умолчанию |
-| `openrouter …` / `ор …` | `openrouter Объясни Python` | OpenRouter |
-| `polza …` / `польза …` | `polza Напиши стих` | Polza.ai |
+Дополнительные переменные (необязательно):
 
-История диалога хранится в памяти бота (до `history_limit` сообщений на пользователя).
+| Переменная | Описание | По умолчанию |
+|------------|----------|--------------|
+| `AI_SYSTEM_PROMPT` | Системный промпт | краткий ассистент VK-бота |
+| `AI_MAX_TOKENS` | Лимит токенов ответа | `1024` |
+| `AI_TEMPERATURE` | Креативность | `0.7` |
+| `AI_HISTORY_LIMIT` | Сообщений в истории | `10` |
+| `AI_TIMEOUT` | Таймаут запроса (сек) | `60` |
+
+**Команда в чате:** `ии …` / `ai …` / `gpt …` — например: `ии Привет!`
+
+История диалога хранится в памяти бота (до `AI_HISTORY_LIMIT` сообщений на пользователя).
 
 ### phrases <a name="bot_modules_phrases"></a>
 Модуль отвечающий за фразы, на которые бот реагирует. Содержит в себе файлы <b>.json</b> формата.
