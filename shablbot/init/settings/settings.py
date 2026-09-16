@@ -7,7 +7,7 @@ import os
 import sys
 from pathlib import Path
 from dotenv import load_dotenv
-from .settings_model import SettingsModel
+from shablbot.settings import SettingsModel
 
 load_dotenv()
 

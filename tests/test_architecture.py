@@ -1,5 +1,6 @@
 import unittest
 from datetime import time
+from pathlib import Path
 from unittest.mock import MagicMock
 
 from shablbot.components.chat import Chat
@@ -8,6 +9,7 @@ from shablbot.core.authorization import AuthorizationService
 from shablbot.core.message_matcher import MessageMatcher
 from shablbot.models.command import CommandSettingsMethods
 from shablbot.models.handler_context import HandlerContext
+from shablbot.settings import SettingsModel
 from shablbot.settings.settings_model import ChatSettingsBody, ChatSettingsBodyTimeWork, TimeWorkEnum
 
 
@@ -68,6 +70,21 @@ class ChatScheduleTests(unittest.TestCase):
         self.assertFalse(
             Chat._is_time_in_range(time(20, 0), time(9, 0), time(18, 0))
         )
+
+
+class SettingsModelSourceTests(unittest.TestCase):
+    def test_init_settings_imports_package_model(self):
+        settings_path = (
+            Path(__file__).resolve().parents[1]
+            / "shablbot"
+            / "init"
+            / "settings"
+            / "settings.py"
+        )
+        settings_source = settings_path.read_text(encoding="utf-8")
+
+        self.assertIn("from shablbot.settings import SettingsModel", settings_source)
+        self.assertNotIn("settings_model.py", settings_source)
 
 
 class CommandHandlerTests(unittest.TestCase):

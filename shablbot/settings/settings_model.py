@@ -92,6 +92,7 @@ class SettingsModel(BaseModel):
         if not value:
             return value
         return {str(chat_id): settings for chat_id, settings in value.items()}
+
     DEBUG_MODE: bool = False
     LOGGER_CONFIG: LoggerConfig
 

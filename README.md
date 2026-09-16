@@ -63,7 +63,6 @@ linux
  ┃  ┣ 📜 bye.json
  ┃  ┗ 📜 hello.json
  ┣ 📂settings
- ┃  ┣ 🐍 settings_model.py
  ┃  ┗ 🐍 settings.py
  ┗ 🐍 manager.py
 ```
@@ -266,6 +265,8 @@ json файл должен содержать следующую структу�
 
 ### settings <a name="bot_modules_settings"></a>
 Модуль отвечающий за настройки бота. Все настройки производятся в файле settings.py. В файле для каждой переменной имеются комментарии, поясняющие, что в них хранится.
+
+Pydantic-модели настроек (`SettingsModel` и связанные типы) поставляются вместе с пакетом `shablbot` и импортируются из `shablbot.settings` — отдельный `settings_model.py` в проекте больше не нужен.
 
 ## 💻 Пример работы
 
