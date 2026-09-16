@@ -58,8 +58,10 @@ linux
  ┃  ┣ 📜 clear.json
  ┃  ┗ 📜 default.json
  ┣ 📂modules
- ┃ ┗ 📂games
- ┃    ┗ 🐍 flip_and_roll.py
+ ┃  ┣ 📂ai
+ ┃  ┃  ┗ 🐍 neural_chat.py
+ ┃  ┗ 📂games
+ ┃     ┗ 🐍 flip_and_roll.py
  ┣ 📂phrases
  ┃  ┣ 📜 _default.json
  ┃  ┣ 📜 bye.json
@@ -232,6 +234,32 @@ def activate_module(func) -> str:
 ```
 
 [Подробнее о структуре кастомных модулей смотрите тут flip_and_roll.py](/shablbot/init/modules/games/flip_and_roll.py)
+
+#### Нейросети (OpenRouter и Polza.ai)
+
+Бот поддерживает подключение нейросетей через [OpenRouter](https://openrouter.ai/) и [Polza.ai](https://polza.ai/) — оба сервиса используют OpenAI-совместимый Chat Completions API.
+
+1. Добавьте модуль `ai.neural_chat` в `ACTIVE_MODULES`
+2. Настройте `AI_SETTINGS` в `settings.py` (или через `.env`):
+
+```env
+AI_ENABLED=true
+OPENROUTER_API_KEY=your_openrouter_key
+POLZA_API_KEY=your_polza_key
+AI_DEFAULT_PROVIDER=openrouter
+OPENROUTER_MODEL=openai/gpt-4o-mini
+POLZA_MODEL=openai/gpt-4o-mini
+```
+
+**Команды в чате:**
+
+| Команда | Пример | Провайдер |
+|---------|--------|-----------|
+| `ии …` / `ai …` / `gpt …` | `ии Привет!` | провайдер по умолчанию |
+| `openrouter …` / `ор …` | `openrouter Объясни Python` | OpenRouter |
+| `polza …` / `польза …` | `polza Напиши стих` | Polza.ai |
+
+История диалога хранится в памяти бота (до `history_limit` сообщений на пользователя).
 
 ### phrases <a name="bot_modules_phrases"></a>
 Модуль отвечающий за фразы, на которые бот реагирует. Содержит в себе файлы <b>.json</b> формата.

@@ -55,7 +55,7 @@ MODULES_FOLDER = "modules"
 # Модули дополнения функциональной возможности бота.
 # Имеется возможность разрабатывать индивидуальные модули , выполненные в определенном формате.
 # (Смотрите пример модуля "flip_and_roll.py")
-ACTIVE_MODULES = ["games.flip_and_roll"]
+ACTIVE_MODULES = ["games.flip_and_roll", "ai.neural_chat"]
 
 # Папка для клавиатур бота
 KEYBOARDS_FOLDER = BASE_DIR.joinpath("keyboards")
@@ -121,6 +121,34 @@ CHAT_SETTINGS = {
     },
 }
 
+# Настройки нейросетей (OpenRouter и Polza.ai)
+AI_SETTINGS = {
+    "enabled": os.getenv("AI_ENABLED", "false").lower() == "true",
+    "default_provider": os.getenv("AI_DEFAULT_PROVIDER", "openrouter"),
+    "history_limit": 10,
+    "timeout": 60.0,
+    "openrouter": {
+        "enabled": os.getenv("OPENROUTER_ENABLED", "true").lower() == "true",
+        "api_key": os.getenv("OPENROUTER_API_KEY", ""),
+        "base_url": "https://openrouter.ai/api/v1",
+        "default_model": os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
+        "system_prompt": "Ты дружелюбный ассистент VK-бота. Отвечай кратко и по-русски.",
+        "max_tokens": 1024,
+        "temperature": 0.7,
+        "http_referer": os.getenv("OPENROUTER_HTTP_REFERER"),
+        "site_title": os.getenv("OPENROUTER_SITE_TITLE", "ShablBot"),
+    },
+    "polza": {
+        "enabled": os.getenv("POLZA_ENABLED", "true").lower() == "true",
+        "api_key": os.getenv("POLZA_API_KEY", ""),
+        "base_url": "https://polza.ai/api/v1",
+        "default_model": os.getenv("POLZA_MODEL", "openai/gpt-4o-mini"),
+        "system_prompt": "Ты дружелюбный ассистент VK-бота. Отвечай кратко и по-русски.",
+        "max_tokens": 1024,
+        "temperature": 0.7,
+    },
+}
+
 # Шанс выпадения ответа бота для каждого из типов редкости
 DEFAULT_PROBABILITY = {
     "common": 0.5,
@@ -176,5 +204,7 @@ SETTINGS = SettingsModel(
     KEYBOARDS_FOLDER=KEYBOARDS_FOLDER,
     KEYBOARDS=KEYBOARDS,
     IS_SHOW_KEYBOARD_TO_CHAT=IS_SHOW_KEYBOARD_TO_CHAT,
+
+    AI_SETTINGS=AI_SETTINGS,
 
 )

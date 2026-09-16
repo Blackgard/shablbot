@@ -4,7 +4,9 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple
 
 from enum import Enum
-from pydantic import BaseModel, ConfigDict, field_validator
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 # TIME WORK MODELS
@@ -80,6 +82,42 @@ class LoggerConfig(BaseModel):
     activation: Optional[List[Tuple[str, bool]]] = None
 
 
+# AI MODELS
+
+
+class AIProviderConfig(BaseModel):
+    enabled: bool = False
+    api_key: str = ""
+    base_url: str
+    default_model: str = "openai/gpt-4o-mini"
+    system_prompt: str = (
+        "Ты дружелюбный ассистент VK-бота. Отвечай кратко, понятно и по-русски."
+    )
+    max_tokens: int = 1024
+    temperature: float = 0.7
+    http_referer: Optional[str] = None
+    site_title: Optional[str] = "ShablBot"
+
+
+class AISettings(BaseModel):
+    enabled: bool = False
+    default_provider: Literal["openrouter", "polza"] = "openrouter"
+    history_limit: int = 10
+    timeout: float = 60.0
+    openrouter: AIProviderConfig = Field(
+        default_factory=lambda: AIProviderConfig(
+            base_url="https://openrouter.ai/api/v1",
+            default_model="openai/gpt-4o-mini",
+        )
+    )
+    polza: AIProviderConfig = Field(
+        default_factory=lambda: AIProviderConfig(
+            base_url="https://polza.ai/api/v1",
+            default_model="openai/gpt-4o-mini",
+        )
+    )
+
+
 # SETTINGS MODELS
 
 
@@ -116,6 +154,8 @@ class SettingsModel(BaseModel):
 
     CHAT_SETTINGS_FILE: Optional[Path] = None
     CHAT_SETTINGS_PERSIST: bool = True
+
+    AI_SETTINGS: AISettings = Field(default_factory=AISettings)
 
     @field_validator("ADMIN_ID", "BOT_CHAT_ID", mode="before")
     @classmethod
