@@ -1,0 +1,42 @@
+{
+    "one_time":false,
+    "buttons":[
+       [
+          {
+             "action":{
+                "type":"text",
+                "payload":"{\"button\": \"1\"}",
+                "label":"Привет"
+             },
+             "color":"positive"
+          },
+          {
+             "action":{
+                "type":"text",
+                "payload":"{\"button\": \"2\"}",
+                "label":"Пока"
+             },
+             "color":"negative"
+          },
+          {
+             "action":{
+                "type":"text",
+                "payload":"{\"button\": \"3\"}",
+                "label":"Ты бот?"
+             },
+             "color":"secondary"
+          }
+
+       ],
+       [
+        {
+            "action":{
+               "type":"text",
+               "payload":"{\"button\": \"4\"}",
+               "label":"Помощь"
+            },
+            "color":"primary"
+         }
+       ]
+    ]
+ }
