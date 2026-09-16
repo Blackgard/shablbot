@@ -1,106 +1,61 @@
 from typing import List, Optional, Tuple
 
-import re
 import loguru
 
-from shablbot.components.chat import Chat
+from shablbot.components.handlers.base import BaseMessageHandler
 from shablbot.components.module import Module, Modules
-from shablbot.models.event_handler import ResponceHandler
+from shablbot.core.message_matcher import MessageMatcher
+from shablbot.models.event_handler import ResponseHandler
+from shablbot.models.handler_context import HandlerContext
+from shablbot.settings.settings_model import SettingsModel
 
-from shablbot.settings.settings_model import (
-    SettingsModel as DefaultSettingsModel,
-)
 
-
-class ModuleHandler:
-    """ModulesHandler description of the module for the bot"""
+class ModuleHandler(BaseMessageHandler):
+    """Обработчик пользовательских модулей."""
 
     def __init__(
-        self, settings: DefaultSettingsModel, modules: Modules, logger: loguru.logger
+        self,
+        settings: SettingsModel,
+        modules: Modules,
+        logger: loguru.logger,
     ) -> None:
         self.logger = logger
         self.settings = settings
-
         self.modules = modules
 
-    def check_message(self, message: str) -> bool:
-        """Check message from chat to module templates
-
-        Args:
-            message (str): The message that was sent to the chat
-
-        Returns:
-            bool: is founded
-        """
-        processed_message = message.lower()
-
-        for _, module in self.modules.get_modules():
-            if not module.is_loaded:
-                continue
-
-            for _, reg_list in module.module_settings.templates.items():
-                find_match = any(
-                    [re.findall(reg, processed_message) for reg in reg_list]
-                )
-                if find_match:
-                    return True
-        return False
+    def check_message(self, context: HandlerContext) -> bool:
+        return self.find_matches_to_message(context.processed_message) is not None
 
     def activate_func(self, module: Module, func_name: str) -> Optional[str]:
-        """Activate module for response
-
-        Args:
-            func_name (str): The function to be called
-
-        Returns:
-            Optional[str]: answer message
-        """
         return module.module_settings.entry_point(func_name)
 
     def find_matches_to_message(
         self, message: str
-    ) -> Tuple[Optional[str], Optional[Module]]:
-        """Find matches with the message.
-
-        Args:
-            message (str):  The message that was sent to the chat
-
-        Returns:
-            first (Optional[str]): name function
-            second (Optional[str]): module
-        """
+    ) -> Optional[Tuple[str, Module]]:
         processed_message = message.lower()
         for _, module in self.modules.get_modules():
             if not module.is_loaded:
                 continue
+
             for func_name, reg_list in module.module_settings.templates.items():
-                for reg in reg_list:
-                    find_match = re.findall(reg, processed_message)
-                    if find_match:
-                        return (func_name, module)
+                if MessageMatcher.matches_any(reg_list, processed_message):
+                    return func_name, module
 
-        return (None, None)
+        return None
 
-    def handling(self, message: str, chat: Chat) -> ResponceHandler:
-        """Handler for regular messages from all chat users
-
-        Args:
-            message (str): The message that was sent to the chat
-            chat (Chat): Chat object
-
-        Returns:
-            answer (str): Answer shablbot for message
-        """
-        func_name, module = self.find_matches_to_message(message)
-        if not func_name and not module:
-            return ResponceHandler(
-                send_to_chat_id=chat.chat_id,
+    def handling(self, context: HandlerContext) -> ResponseHandler:
+        match = self.find_matches_to_message(context.processed_message)
+        if not match:
+            return ResponseHandler(
+                send_to_chat_id=context.reply_chat_id,
                 message=None,
-                error="Not found matches."
+                error="Not found matches.",
+                is_matches_found=False,
             )
 
-        return ResponceHandler(
-            send_to_chat_id=chat.chat_id,
+        func_name, module = match
+        return ResponseHandler(
+            send_to_chat_id=context.reply_chat_id,
             message=self.activate_func(module, func_name),
-            is_matches_found=True
+            is_matches_found=True,
         )

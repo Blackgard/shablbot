@@ -68,13 +68,13 @@ class Phrase:
 
         for _, word_body in self.words.items():
             for template in word_body.templates:
-                if not preffix_list:
+                if preffix_list:
                     for _preffix in preffix_list:
                         self.__findall(
                             f"{_preffix}{template}",
                             word_body,
                             processed_message,
-                            matched_list
+                            matched_list,
                         )
                 else:
                     self.__findall(template, word_body, processed_message, matched_list)

@@ -17,6 +17,8 @@
 
 ## 🎈 Установка <a name="#install"></a>
 
+Требуется **Python 3.9+**.
+
 Можете воспользоваться командой [pip](https://pypi.org/project/pip/):
 ```cmd
  pip install shablbot
@@ -63,8 +65,9 @@ linux
  ┃  ┣ 📜 bye.json
  ┃  ┗ 📜 hello.json
  ┣ 📂settings
- ┃  ┣ 🐍 settings_model.py
  ┃  ┗ 🐍 settings.py
+ ┣ 📂data
+ ┃  ┗ 📜 chat_settings.json
  ┗ 🐍 manager.py
 ```
 <div align="center"><font size="2" style="text-align:center">Более подробно про каждый из каталогов будет рассказано далее</font></div>
@@ -127,7 +130,7 @@ linux
 
 ### commands <a name="bot_modules_commands"></a>
 Модуль отвечающий за команды управления ботом. Нужен для администрирования. Делятся на два типа:
-1. <b>private</b> - доступные только администратору бота
+1. <b>private</b> - доступные и выполняемые только администратору бота (`ADMIN_ID`)
 2. <b>public</b> - доступные всем пользователям
 
 > :bell: Команды нужно подключать в настройках бота. Переменная <b>ACTIVE_COMMANDS</b>.
@@ -267,6 +270,32 @@ json файл должен содержать следующую структу�
 ### settings <a name="bot_modules_settings"></a>
 Модуль отвечающий за настройки бота. Все настройки производятся в файле settings.py. В файле для каждой переменной имеются комментарии, поясняющие, что в них хранится.
 
+Pydantic-модели настроек (`SettingsModel` и связанные типы) поставляются вместе с пакетом `shablbot` и импортируются из `shablbot.settings` — отдельный `settings_model.py` в проекте больше не нужен:
+
+```python
+from shablbot.settings import SettingsModel
+```
+
+#### Сохранение настроек чатов
+
+Настройки отдельных чатов (включён/выключен, расписание работы) автоматически сохраняются в JSON-файл и восстанавливаются после перезапуска бота:
+
+```python
+CHAT_SETTINGS_FILE = BASE_DIR.joinpath("data", "chat_settings.json")
+CHAT_SETTINGS_PERSIST = True
+```
+
+Файл `data/chat_settings.json` создаётся автоматически при первом изменении настроек чата (например, после команды «выкл бот»). Значения из `CHAT_SETTINGS` в `settings.py` используются как начальные; сохранённые в файле настройки имеют приоритет.
+
+## 🧪 Тесты
+
+```bash
+pip install -e .
+python -m unittest discover -s tests -p "test_*.py" -v
+```
+
+Тесты запускаются в CI на Python 3.9–3.13 (GitHub Actions и Azure Pipelines).
+
 ## 💻 Пример работы
 
 Бот по имени "Ходор" - [клик-клик (вк)](https://vk.com/hodor_designer)
@@ -289,6 +318,8 @@ optional arguments:
 
 (c) Alex Drachenin
 ```
+
+> Примечание: флаги `--run-bot`, `--init` и `--check-bot` также доступны через `python -m shablbot`.
 
 Для старта работы с ботом вы можете воспользоваться методом "--init" таким образом:
 ```console

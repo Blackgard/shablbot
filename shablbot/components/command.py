@@ -166,7 +166,7 @@ class Commands:
             if command.is_loaded
         ])
 
-        if processed_chat.chat_id == self.settings.ADMIN_ID:
+        if int(processed_chat.chat_id) == self.settings.ADMIN_ID:
             help_commands += "\n\n"
             help_commands += "\n\n".join([
                 command_format_private.format(

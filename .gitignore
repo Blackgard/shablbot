@@ -9,3 +9,10 @@
 
 # cmd build commands
 build.cmd
+
+# python
+__pycache__/
+*.py[cod]
+
+# runtime data
+data/

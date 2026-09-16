@@ -7,7 +7,7 @@ import os
 import sys
 from pathlib import Path
 from dotenv import load_dotenv
-from .settings_model import SettingsModel
+from shablbot.settings import SettingsModel
 
 load_dotenv()
 
@@ -93,6 +93,12 @@ TYPE_TIME_WORK = {
     "DAY_MSK": "Europe/Moscow",
 }
 
+# Файл для сохранения настроек чатов между перезапусками бота
+CHAT_SETTINGS_FILE = BASE_DIR.joinpath("data", "chat_settings.json")
+
+# Включить автосохранение настроек чатов в файл
+CHAT_SETTINGS_PERSIST = True
+
 # Настройки времени работы конкретного чата
 CHAT_SETTINGS = {
     123456789: {
@@ -133,7 +139,7 @@ LOGGER_CONFIG = {
             format="<green>{time:YYYY-MM-DD at HH:mm:ss}</green> | <level>{level}</level> | {message}"
         ),
         dict(
-            sink=open("main.log", mode="w", encoding="UTF-8"),
+            sink=BASE_DIR.parent.joinpath("main.log"),
             format="{time} | {level} | {name}:{function}:{line} | {message}"
         )
     ],
@@ -155,6 +161,8 @@ SETTINGS = SettingsModel(
     DEFAULT_PROBABILITY=DEFAULT_PROBABILITY,
 
     CHAT_SETTINGS=CHAT_SETTINGS,
+    CHAT_SETTINGS_FILE=CHAT_SETTINGS_FILE,
+    CHAT_SETTINGS_PERSIST=CHAT_SETTINGS_PERSIST,
 
     PHRASES_FOLDER=PHRASES_FOLDER,
     EXCLUDED_PHRASES=EXCLUDED_PHRASES,

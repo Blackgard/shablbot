@@ -41,8 +41,11 @@ class Keyboard:
         """
         if not self.path_to_keyboard: return None
 
-        with open(self.path_to_keyboard, encoding="utf-8") as json_keyboard:
-            return json.loads(json_keyboard.read())
+        try:
+            with open(self.path_to_keyboard, encoding="utf-8") as json_keyboard:
+                return json.loads(json_keyboard.read())
+        except (OSError, json.JSONDecodeError) as err:
+            return None
 
     def __str__(self):
         is_active_str = f'{ColorText.OKGREEN}включен{ColorText.ENDC}' if self.is_loaded else f'{ColorText.FAIL}выключен{ColorText.ENDC}'
